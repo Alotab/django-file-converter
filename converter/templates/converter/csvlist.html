@@ -1,0 +1,25 @@
+{% extends "converter/base.html" %}
+
+{% block content %}
+    <div class="csv-detail-container">
+        <h2>CSV FILE UPLOAD DETAILS</h2>
+        {% for list in object_list %}
+        <div class="csv-container">
+            <!-- object_list is a context variable that is automatically provided by Django’s ListView class. When you create a view that subclasses ListView, Django will automatically retrieve the queryset of objects for the specified model and pass it to the template as the object_list context variable  -->
+           
+            <div class="csv-name">
+                <a href="files/{list.id}"><p><span>Name:</span> {{ list.first_name}}{{list.last_name}}</p></a>
+                <div class="sex">
+                    <p class="csv-gender"><span>Gender:</span> {{list.gender}}</p>
+                    <p class="csv-age"><span>Age:</span> {{ list.age}} years</p>
+                </div>
+            </div>
+            <div class="csv-contact">
+                <p class="csv-phone"><span>Tel:</span> {{list.phone}}</p>
+                <p class="csv-email"><span>Email:</span> {{list.email}}</p>
+            </div>
+            
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

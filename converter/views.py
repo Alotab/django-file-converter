@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.contrib.auth.models import User
+from django.views.generic import ListView
 from rest_framework import viewsets
 from rest_framework import permissions
 from .models import uploadConverter
@@ -32,6 +33,11 @@ def upload_csv(request):
 
 
 
+class CsvFileList(ListView):
+    model = uploadConverter
+    template_name = 'converter/csvlist.html'
+
+
 
 class UploadViewSet(viewsets.ModelViewSet):
     """
@@ -43,7 +49,7 @@ class UploadViewSet(viewsets.ModelViewSet):
     serializer_class = UploadConverterSerializer 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    
+   
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
