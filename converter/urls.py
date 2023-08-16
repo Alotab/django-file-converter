@@ -20,7 +20,11 @@ router.register(r'files', views.UploadViewSet, basename='files')
 
 
 urlpatterns = [
-    path('upload/', views.upload_csv),
+    path('upload/', views.upload_csv, name='upload_csv'),
+    path('uploads/', views.upload_jpg, name='upload_jpg'),
+    # path('uploads/', views.post, name='post'),
+    # path('uploads/<output_filename>', views.download_pdf, name='download_pdf'),
+    path('download_pdf/<str:output_filename>/', views.download_pdf, name='download_pdf'),
     path('files/', views.CsvFileList.as_view(), name='file-list'),
     path('rest_api/', include(router.urls)),
 ]

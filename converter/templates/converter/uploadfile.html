@@ -2,9 +2,33 @@
 
 {% block content %}
     <h1>Upload CSV</h1>
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="{% url 'upload_csv' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="csv_file">
         <input type="submit" value="Upload">
     </form>
+
+
+
+    <form action="{% url 'upload_jpg' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="jpg_file" multiple>
+        <input type="submit" value="Upload">
+    </form>
+
+    {% if output_filename %}
+    <a href="{% url 'download_pdf' output_filename %}" class="btn btn-primary">Download</a>
+    {% endif %}
+
+    <!-- <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="jpg_file" multiple>
+        <input type="submit" value="Upload">
+    </form> -->
+
+    {% if pdf_file %}
+        <a href="{{ pdf_file }}" download="{{ filename }}">Download PDF</a>
+    {% endif %}
+   
+   
 {% endblock %}
