@@ -25,8 +25,9 @@
         <input type="file" name="jpg_file" multiple>
         <input type="submit" value="Upload">
     </form> -->
-
-    {% if pdf_file %}
+    {% if error %}
+        <p>{{ error }}</p>
+    {% elif pdf_file %}
         <a href="{{ pdf_file }}" download="{{ filename }}">Download PDF</a>
     {% endif %}
    
