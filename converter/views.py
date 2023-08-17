@@ -9,6 +9,7 @@ from .models import uploadConverter
 from converter.serializers import UploadConverterSerializer, UserSerializer
 from converter.permissions import IsOwnerOrReadOnly
 import csv
+import os
 
 # from io import BytesIO
 # from img2pdf import convert
@@ -16,7 +17,28 @@ import csv
 import tempfile
 from PyPDF2 import PdfMerger
 from PIL import Image
-# from win32com import client  
+import pandas as pd
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from .utils import convert_file
+from .forms import UploadFileForm
+
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            # Get the uploaded file and selected conversion option
+            uploaded_file = request.FILES['file']
+            conversion = form.cleaned_data['conversion']
+
+            # Call the appropritae function to perfrom the conversion
+            converted_file = convert_file(uploaded_file, conversion)
+
+    else:
+        form = UploadFileForm()
+    return render(request, 'converter/uploadfile.html', {'form': form})
 
 
 
@@ -46,8 +68,6 @@ def upload_csv(request):
         return redirect('files')
     return render(request, 'converter/uploadfile.html')
 
-
-
 class CsvFileList(ListView):
     """
         List view for populating/Listing all the queryset
@@ -57,108 +77,109 @@ class CsvFileList(ListView):
 
 
 
-# Convert jpg files into pdf
-def upload_jpg(request):
-    """
-    This function converts the image files uploaded by the user into one PDF file.
-    """
-    output_filename = None
-    if request.method == 'POST':
-        jpg_files = request.FILES.getlist('jpg_file')
-        # jpg_files = jpg_files.name
-        # _, jpg_file_extension = os.path.splitext(jpg_files)
-        # jpg_filez = [jpg_filez for jpg_filez in jpg_files if jpg_file_extension in ['.jpg', '.jpeg']]
-        if not jpg_files:
-            # No files were uploaded, return an error message
-            return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
-        jpg_pdfs = []
-        merger = PdfMerger()
-        for filename in jpg_files:
-            filenamez = filename.name
-            _, file_extension = os.path.splitext(filenamez)
-            if file_extension in ['.jpg', '.jpeg']:
-                jpg_pdfs.append(filename)
-
-                # im = Image.open(filename)
-                im = Image.open(filename)
-                
-                if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
-                    im.load()
-                    background = Image.new("RGB", im.size, (255, 255, 255))
-                    background.paste(im, mask=im.split()[3])
-                    im = background
-
-                # Create a temporary file with a unique name
-                with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
-                    # Save the image as a temporary PDF file
-                    im.save(temp.name, 'PDF')
-
-                    # Add the temporary PDF file to the merger
-                    merger.append(temp.name)
-
-            else:
-                print("File Error: Upload .jpg or .jpeg files")
-                return render(request, 'converter/uploadfile.html', {'output_filename': output_filename})
 
 
-        # Save the merged PDF file
-        output_filename = 'output.pdf'
-        merger.write(output_filename)
-        merger.close()
 
-    return render(request, 'converter/uploadfile.html', {'output_filename': output_filename})
-
-
-def download_pdf(request, output_filename):
-    """
-    This function allows the user to download the specified PDF file.
-    """
-    # Create a new FileResponse object
-    response = FileResponse(open(output_filename, 'rb'))
-
-    # Set the content type to 'application/pdf'
-    response['Content-Type'] = 'application/pdf'
-
-    # Set the content disposition to 'attachment' to trigger a download
-    response['Content-Disposition'] = f'attachment; filename="{output_filename}"'
-
-    return response
-
-
-import os
-
-
-# .xlsx to pdf
-# def excel_to_pdf(request):
-#     output_filename = None
+####  Convert jpg files into pdf
+# def upload_jpg(request):
+#     """
+#     This function converts the image files uploaded by the user into one PDF file.
+#     """
+#     pdfFile = None
 #     if request.method == 'POST':
-#         excelFile = request.FILES['jpg_file']
-#         filename = excelFile.name
-#         # filename = excelFile.filename
-#         _, file_extension = os.path.splitext(filename)
+#         jpg_files = request.FILES.getlist('file')
+#         if not jpg_files:
+#             # No files were uploaded, return an error message
+#             return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+#         jpg_pdfs = []
+#         merger = PdfMerger()
+#         for filename in jpg_files:
+#             filenamez = filename.name
+#             _, file_extension = os.path.splitext(filenamez)
+#             if file_extension in ['.jpg', '.jpeg']:
+#                 jpg_pdfs.append(filename)
 
-#         if file_extension in ['.xlsx', '.xls']:
-#             # open microsoft excel (using it's built-in functionality)
-#             excel = client.Dispatch("Excel.Application")
+#                 im = Image.open(filename)
+                
+#                 if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
+#                     im.load()
+#                     background = Image.new("RGB", im.size, (255, 255, 255))
+#                     background.paste(im, mask=im.split()[3])
+#                     im = background
+
+#                 # Create a temporary file with a unique name
+#                 with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
+#                     # Save the image as a temporary PDF file
+#                     im.save(temp.name, 'PDF')
+
+#                     # Add the temporary PDF file to the merger
+#                     merger.append(temp.name)
+
+#             else:
+#                 print("File Error: Upload .jpg or .jpeg files")
+#                 return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
 
-#             # Save uploaded file to disk
-#             with open(filename, 'wb') as f:
-#                 for chunk in excelFile.chunks():
-#                     f.write(chunk)
+#         # Save the merged PDF file
+#         pdfFile = 'output.pdf'
+#         merger.write(pdfFile)
+#         merger.close()
 
-#             # read excel file
-#             # xlsheet = excel.Workbooks.open(filename)
-#             xlsheet = excel.Workbooks.open(filename)
-#             work_xlsheet = xlsheet.Worksheets[0]
+#     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
-#             # create a new file with .pdf extension to save the new file
-#             output_filename = "excel2pdf.pdf"
 
-#             # converting to pdf file
-#             work_xlsheet.ExportAsFixedFormat(0, output_filename )
+# def download_pdf(request, pdfFile):
+#     """
+#     This function allows the user to download the specified PDF file.
+#     """
+#     # Create a new FileResponse object
+#     response = FileResponse(open(pdfFile, 'rb'))
 
-#     return render(request,'converter/uploadfile.html', {'new_file': output_filename })
+#     # Set the content type to 'application/pdf'
+#     response['Content-Type'] = 'application/pdf'
+
+#     # Set the content disposition to 'attachment' to trigger a download
+#     response['Content-Disposition'] = f'attachment; filename="{pdfFile}"'
+
+#     return response
+
+
+## .xlsx to pdf
+def xlsx_to_pdf(request):
+    if request.method == 'POST':
+        xlsxFiles = request.FILES.getlist('file')
+
+        if not xlsxFiles:
+            return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+
+        for xfile in xlsxFiles:
+
+            # Read the data from the Excel file
+            data = pd.read_excel(xfile)
+
+            # Create a PDF document
+            pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
+
+            # Create a table with the data
+            tabel = Table(data.values)
+
+            # Add some style to the table
+            tabel.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+                ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+            ]))
+
+            # Add tabel to the PDF document
+            pdfFile.build([tabel])
+
+    return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
+
+
 
 
 
@@ -174,9 +195,6 @@ class UploadViewSet(viewsets.ModelViewSet):
    
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-
-
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """
