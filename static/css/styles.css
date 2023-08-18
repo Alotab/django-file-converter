@@ -64,3 +64,11 @@ span{
     color: rgb(246, 125, 4);
     font-weight: 600;
 }
+
+
+
+li .skip{
+    background: yellow;
+    width: 10px;
+    height: 10px;
+}

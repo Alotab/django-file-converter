@@ -20,25 +20,41 @@ from PIL import Image
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from .utils import convert_file
+from .utils import convert_file 
 from .forms import UploadFileForm
 
 
 def upload_file(request):
+    converted_File = None
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
 
             # Get the uploaded file and selected conversion option
-            uploaded_file = request.FILES['file']
+            uploaded_file = request.FILES.getlist('file')
             conversion = form.cleaned_data['conversion']
+            # print(uploaded_file)
+            # print(conversion)
 
+            # print('before................')
             # Call the appropritae function to perfrom the conversion
-            converted_file = convert_file(uploaded_file, conversion)
+            converted_File = convert_file(uploaded_file, conversion)
+            
+            
+            # converted_File = upload_jpg(uploaded_file)
+           
+
+
+            # print(converted_File)
+
+            # # # Serve the converted file as a download
+            # response = FileResponse(open(converted_File , 'rb'), content_type='application/pdf')
+            # response['Content-Disposition'] = f'attachment; filename="{converted_File }"'
+            # return response
 
     else:
         form = UploadFileForm()
-    return render(request, 'converter/uploadfile.html', {'form': form})
+    return render(request, 'converter/uploadfile.html', {'form': form, 'converted_File': converted_File})
 
 
 
@@ -128,20 +144,20 @@ class CsvFileList(ListView):
 #     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
 
-# def download_pdf(request, pdfFile):
-#     """
-#     This function allows the user to download the specified PDF file.
-#     """
-#     # Create a new FileResponse object
-#     response = FileResponse(open(pdfFile, 'rb'))
+def download(request, converted_File):
+    """
+    This function allows the user to download the specified PDF file.
+    """
+    # Create a new FileResponse object
+    response = FileResponse(open(converted_File, 'rb'))
 
-#     # Set the content type to 'application/pdf'
-#     response['Content-Type'] = 'application/pdf'
+    # Set the content type to 'application/pdf'
+    response['Content-Type'] = 'application/pdf'
 
-#     # Set the content disposition to 'attachment' to trigger a download
-#     response['Content-Disposition'] = f'attachment; filename="{pdfFile}"'
+    # Set the content disposition to 'attachment' to trigger a download
+    response['Content-Disposition'] = f'attachment; filename="{converted_File}"'
 
-#     return response
+    return response
 
 
 ## .xlsx to pdf
