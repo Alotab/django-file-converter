@@ -24,34 +24,30 @@ from .utils import convert_file
 from .forms import UploadFileForm
 
 
+from django import template
+
+
+
 def upload_file(request):
     converted_File = None
+    converted_file = None
+    converted_file_list = []
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
 
             # Get the uploaded file and selected conversion option
-            uploaded_file = request.FILES.getlist('file')
+            uploaded_files = request.FILES.getlist('file')
             conversion = form.cleaned_data['conversion']
-            # print(uploaded_file)
-            # print(conversion)
-
-            # print('before................')
-            # Call the appropritae function to perfrom the conversion
-            converted_File = convert_file(uploaded_file, conversion)
             
-            
-            # converted_File = upload_jpg(uploaded_file)
-           
+          
+            converted_File = convert_file(uploaded_files, conversion)
 
-
-            # print(converted_File)
-
-            # # # Serve the converted file as a download
-            # response = FileResponse(open(converted_File , 'rb'), content_type='application/pdf')
-            # response['Content-Disposition'] = f'attachment; filename="{converted_File }"'
-            # return response
-
+            # convert each uploaded file
+            # for upload_file in uploaded_files:
+            #     converted_file = convert_file(upload_file, conversion)
+            #     converted_file_list.append((converted_file, upload_file))
+          
     else:
         form = UploadFileForm()
     return render(request, 'converter/uploadfile.html', {'form': form, 'converted_File': converted_File})

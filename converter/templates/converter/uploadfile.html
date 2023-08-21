@@ -14,34 +14,7 @@
         </select><br><br>
         <input type="submit" value="Upload">
     </form>
-   
 
-
-    <!-- <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit</button>
-    </form> -->
-    
-
-
-
-    <!-- <h1>Upload CSV</h1>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="csv_file">
-        <input type="submit" value="Upload">
-        <h1>url --- upload_csv</h1>
-    </form> -->
-
-
-
-    <!-- <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="file" name="file" multiple>
-        <input type="submit" value="Upload">
-        <h1>url upload_jpg</h1>
-    </form> -->
 
     {% if converted_File %}
     <a href="{% url 'download' converted_File %}" class="btn btn-primary">Download</a>
@@ -52,11 +25,11 @@
         <input type="file" name="jpg_file" multiple>
         <input type="submit" value="Upload">
     </form> -->
-    {% if error %}
+    <!-- {% if error %}
         <p>{{ error }}</p>
     {% elif pdf_file %}
         <a href="{{ pdf_file }}" download="{{ filename }}">Download PDF</a>
-    {% endif %}
+    {% endif %} -->
    
    
 {% endblock %}
