@@ -12,7 +12,10 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 
 from django.core.files import File
-def upload_jpg(files):
+
+
+
+def upload_jpg(files, conversion, name):
     """
     This function converts the `.jpg` and `.jpeg` files into one `.pdf` file.
     """
@@ -37,30 +40,20 @@ def upload_jpg(files):
             merger.append(temp.name)
 
     # Save the merged PDF file
-    pdfFile = 'output.pdf'
+    pdfFile = f"{name}.{conversion}"
+    # pdfFile = 'output.pdf'
     merger.write(pdfFile)
     merger.close()
     return pdfFile
     # return File(open(pdfFile, 'rb'), name=pdfFile)
     
 
-
-
-
-# def read_excel_file(file):
-#     """
-#     This function reads the data from an Excel file.
-#     """
-#     wb = openpyxl.load_workbook(file)
-#     sheet = wb.active
-#     data = sheet
-#     return data
-
-
-
 def xlsx_to_pdf(files):
-    pdfFile = "output.pdf"
+    """
+        This function converts all excel files `.xlsx`, `.xlx` into `pdf`
+    """
 
+    pdfFile = "output.pdf"
     for file in files:
         print(file, '....................................................')
 
@@ -101,7 +94,6 @@ def xlsx_to_pdf(files):
     return pdfFile
 
 
-
 def convert_file(files, conversion):
     newFile = None
     
@@ -109,13 +101,13 @@ def convert_file(files, conversion):
         filename = file.name
         # file = file.name.replace('\x00', '')
         print(file)
-        _, file_extension = os.path.splitext(filename)
-        # print(file_extension)
+        hii, file_extension = os.path.splitext(filename)
+        print(hii)
         # print(conversion)
         if file_extension in ('.jpg', '.jpeg') and 'pdf' in conversion:
-            newFile = upload_jpg(files)
-
-        if file_extension in ('.xlsx') and 'pdf' in conversion:
+            # newFile = upload_jpg(files)
+            newFile = upload_jpg(files, conversion, name=hii)
+        elif file_extension in ('.xlsx') and 'pdf' in conversion:
             newFile = xlsx_to_pdf(files)
         else:
             print(f'File extension {file_extension} is not')

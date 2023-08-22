@@ -22,6 +22,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from .utils import convert_file 
 from .forms import UploadFileForm
+from .models import File
 
 
 from django import template
@@ -36,12 +37,26 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
 
+           
+
             # Get the uploaded file and selected conversion option
             uploaded_files = request.FILES.getlist('file')
             conversion = form.cleaned_data['conversion']
-            
-          
-            converted_File = convert_file(uploaded_files, conversion)
+            # print(conversion)
+            for file in uploaded_files:
+                # hii, file_extension = os.path.splitext(file)
+                # print(hii)
+                # converted_File = convert_file(uploaded_files, conversion)
+                converted_File = convert_file(uploaded_files, conversion)
+
+                # file_obj = File.objects.create(
+                #     file_name=file,
+                #     file_type=file_extension,
+                #     file_content=file.read(),
+                #     converted_file_name=f"{file.name}.pdf",
+                #     converted_file_type="pdf",
+                #     converted_file_content=converted_file,
+                # )
 
             # convert each uploaded file
             # for upload_file in uploaded_files:
