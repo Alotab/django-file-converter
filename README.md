@@ -11,8 +11,11 @@ To install the File Converter Django App, follow these steps:
 
 ## Clone this repository to your local machine.
 Navigate to the root directory of the repository.
+
 Run `pip install -r requirements.txt`  to install the required dependencies.
+
 Run `python manage.py migrate` to set up the database.
+
 Run `python manage.py runserver` to start the development server.
 
 ## Usage
