@@ -36,18 +36,31 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            print(form.cleaned_data)
 
             # Get the uploaded file and selected conversion option
             uploaded_files = request.FILES.getlist('file')
-            print(uploaded_files)
-            # conversion = form.cleaned_data['conversion']
-            # print(conversion)
+         
+            conversion = form.cleaned_data['conversion']
+            print(conversion)
             for file in uploaded_files:
                 # hii, file_extension = os.path.splitext(file)
                 # print(hii)
                 # converted_File = convert_file(uploaded_files, conversion)
-                converted_File = convert_file(uploaded_files)
+                converted_File = convert_file(uploaded_files, conversion)
+
+                # file_obj = File.objects.create(
+                #     file_name=file,
+                #     file_type=file_extension,
+                #     file_content=file.read(),
+                #     converted_file_name=f"{file.name}.pdf",
+                #     converted_file_type="pdf",
+                #     converted_file_content=converted_file,
+                # )
+
+            # convert each uploaded file
+            # for upload_file in uploaded_files:
+            #     converted_file = convert_file(upload_file, conversion)
+            #     converted_file_list.append((converted_file, upload_file))
           
     else:
         form = UploadFileForm()

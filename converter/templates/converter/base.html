@@ -7,11 +7,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Convert Files</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 </head>
 <body>
+    <header>
+        <div class="left-nav">
+            <div class="logo"><p>FileConverter</p></div>
+            <nav>
+                <div class="link">
+                    <p>Convert</p>
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z"></path></svg> -->
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="link">
+                    <p>API</p>
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z"></path></svg> -->
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+                <div class="link">
+                    <p>Pricing</p>
+                    <!-- <i class="ri-arrow-down-s-line"></i> -->
+                </div>
+            </nav>
+        </div>
+
+        <div class="right-nav">
+            <a href="#">Sign up</a>
+            <a class="login" href="#">Login</a>
+        </div>
+    </header>
 
     {% block content %}
     {% endblock %}
+
+
+
+
+
+
+
+
+
+     <!--=============== MAIN-JAVASCRIPT SECTION ===============-->
+     <script src="{% static 'js/script.js' %}" type="module"></script>
     
 </body>
 </html>

@@ -20,9 +20,11 @@ CONVERSION_CHOICES = [
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
-    conversion = forms.ChoiceField(choices=CONVERSION_CHOICES)
+    format = forms.CharField()
+    # conversion = forms.ChoiceField(choices=CONVERSION_CHOICES)
 
-# widget=forms.Select()
+
+
 
 
 # class UploadFileForm(forms.Form):

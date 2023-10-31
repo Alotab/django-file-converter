@@ -2,7 +2,66 @@
 
 {% block content %}
 
-    <form action="{% url 'upload_file' %}" method="post" enctype="multipart/form-data">
+
+    <div class="convertor-wrapper">
+
+        <div class="conveter-container">
+            <div class="upload-box">
+                <div class="select-file">
+                    <!-- Upload files  -->
+                    <form action="{% url 'upload_file' %}"  id="file-form" method="post"  enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <i class="ri-file-add-fill"></i>
+                        <p>Select File</p>
+                        <input type="file" id="file-input" name="files[]" multiple> 
+                    </form>   
+                </div>
+                <div class="drop-down">
+                    <i class="ri-arrow-down-s-line"></i>
+                    <div class="drop-down-list">
+                        <button><i class="ri-folder-open-fill"></i><p>From my computer</p></button>
+                        <button><i class="ri-links-line"></i><p>By URL</p></button>
+                        <button><i class="ri-drive-fill"></i><p>From Google Drive</p></button>
+                        <button><i class="ri-dropbox-fill"></i><p>From Drop Box</p></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- List uploaded files on the screen and select format type -->
+    <div class="result-container">
+        <div class="addfiles-Todo">
+            <ul id="files-list">
+                <!-- add uploaded files here  (Javascript) -->
+                <li class="file-list">
+                    
+                </li> 
+            </ul>
+     
+            <div class="convert-button">
+                <i class="ri-refresh-line"></i>
+                <button class="convert"><p>Convert</p></button>
+            </div>
+           
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- <form action="{% url 'upload_file' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="file">Choose file:</label>
         <input type="file" id="file" name="file" multiple><br><br>
@@ -13,7 +72,7 @@
             {% endfor %}
         </select><br><br>
         <input type="submit" value="Upload">
-    </form>
+    </form> -->
 
 
     {% if converted_File %}
