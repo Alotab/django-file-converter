@@ -9,7 +9,7 @@
             <div class="upload-box">
                 <div class="select-file">
                     <!-- Upload files  -->
-                    <form action="{% url 'upload_file' %}"  id="file-form" method="post"  enctype="multipart/form-data">
+                    <form id="file-form" method="post"  enctype="multipart/form-data">
                         {% csrf_token %}
                         <i class="ri-file-add-fill"></i>
                         <p>Select File</p>
@@ -34,14 +34,12 @@
         <div class="addfiles-Todo">
             <ul id="files-list">
                 <!-- add uploaded files here  (Javascript) -->
-                <li class="file-list">
-                    
-                </li> 
+                
             </ul>
      
-            <div class="convert-button">
+            <div class="convert-button convert">
                 <i class="ri-refresh-line"></i>
-                <button class="convert"><p>Convert</p></button>
+                <button class="converts"><p>Convert</p></button>
             </div>
            
         </div>

@@ -8,6 +8,7 @@ from rest_framework import permissions
 from .models import uploadConverter
 from converter.serializers import UploadConverterSerializer, UserSerializer
 from converter.permissions import IsOwnerOrReadOnly
+from django.views.decorators.csrf import csrf_exempt
 import csv
 import os
 
@@ -27,31 +28,42 @@ from .models import File
 
 from django import template
 
-
-
+@csrf_exempt
 def upload_file(request):
-    converted_File = None
-    converted_file = None
-    converted_file_list = []
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            print(form.cleaned_data)
+    if request.method == "POST":
+        files = request.FILES.getlist('files')
+        formats = request.POST.getlist('formats')
+        print(formats)
 
-            # Get the uploaded file and selected conversion option
-            uploaded_files = request.FILES.getlist('file')
-            print(uploaded_files)
-            # conversion = form.cleaned_data['conversion']
-            # print(conversion)
-            for file in uploaded_files:
-                # hii, file_extension = os.path.splitext(file)
-                # print(hii)
-                # converted_File = convert_file(uploaded_files, conversion)
-                converted_File = convert_file(uploaded_files)
+        for file, format in zip(files, formats):
+            print(file, format)
+    return render(request, 'converter/uploadfile.html')
+
+
+
+# def upload_file(request):
+#     converted_File = None
+#     converted_file = None
+#     converted_file_list = []
+#     if request.method == 'POST':
+#         # form = UploadFileForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             print(form.cleaned_data)
+
+#             # Get the uploaded file and selected conversion option
+#             uploaded_files = request.FILES.getlist('file')
+#             print(uploaded_files)
+#             # conversion = form.cleaned_data['conversion']
+#             # print(conversion)
+#             for file in uploaded_files:
+#                 # hii, file_extension = os.path.splitext(file)
+#                 # print(hii)
+#                 # converted_File = convert_file(uploaded_files, conversion)
+#                 converted_File = convert_file(uploaded_files)
           
-    else:
-        form = UploadFileForm()
-    return render(request, 'converter/uploadfile.html', {'form': form, 'converted_File': converted_File})
+#     else:
+#         form = UploadFileForm()
+#     return render(request, 'converter/uploadfile.html', {'form': form, 'converted_File': converted_File})
 
 
 
