@@ -16,74 +16,9 @@
   
 // })
 
-// document.getElementById('file-input').addEventListener('change', function() {
-//     var form = document.getElementById('file-form');
-//     var formData = new FormData(form);
-//     var xhr = new XMLHttpRequest();
-//     xhr.open('POST', form.action);
-//     xhr.onload = function() {
-//         if (xhr.status === 200) {
-//             // Update the page with the uploaded files
-//             // For example, you could display a list of links to the uploaded files
-//         } else {
-//             alert('An error occurred!');
-//         }
-//     };
-//     xhr.send(formData);
-// });
-
-
-const fileInput = document.querySelector('#file-input');
-const formatSelects = document.querySelectorAll('.btn-button');
-const convertButton = document.querySelector('.convert');
-
-
-// Select all buttons with the class 'btn-button'
-const formatButtons = document.querySelectorAll('.btn-button');
-
-convertButton.addEventListener('click', () => {
-    // Create an array of the selected formats
-    var formats = Array.from(formatButtons).filter(button => button.classList.contains('li span')).map(button => button.textContent);
-
-    // console.log(formats); // This will log something like ['jpeg', 'png'] if those formats are selected
-});
 
 
 
-
-
-
-
-
-
-
-convertButton.addEventListener('click', () => {
-    var files = fileInput.files;
-    var formats = Array.from(formatSelects).map(select => select.value);
-    // console.log(formats);
-
-    var formData = new FormData();
-    Array.from(files).forEach((file, index)=> {
-        formData.append('files', file);
-        formData.append('formats', formats[index]);
-    });
-
-    $.ajax({
-        type: 'POST', 
-        url: "/upload/",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(res) {
-            console.log('Data successfully transfer');
-        },
-        error: function(err) {
-            console.log(err);
-        }
-    
-    });
-
-});
 
 
 
@@ -123,7 +58,7 @@ function handleFilesSelected(){
                           <div class="select-conversion-container">
                               <span>to</span>
                               <div class="conversion">
-                                  <button class="btn-button btn-caret btn btn-sm btn-outline-dark formatSelect"> <i></i></button>
+                                  <button class="btn-button btn-caret btn btn-sm btn-outline-dark" id="formatSelect"></button>
                                   <!-- <div class="select-convertor"> -->
                                       
                                       <!-- <div class="enclose"> -->
@@ -247,15 +182,88 @@ function handleFilesSelected(){
               activateDrop.style.display = "none";
 
               buttonClick.textContent = format.textContent;
+              
 
               buttonClick.style.setProperty('--display', mydisplay());
-              selectedFormats.push(format.textContent);
+            //   selectedFormats.push(format.textContent);
             });
           });
         };
-        console.log(selectedFormats);
+
+       
+        
     };
 }
+
+
+
+const fileInput = document.querySelector('#file-input');
+const formatSelects = document.querySelectorAll('.btn-button');
+const convertButton = document.querySelector('.convert');
+
+const selectForma = document.getElementById('formatSelect');
+
+
+convertButton.addEventListener('click', ()=> {
+    const selectForma = document.querySelectorAll('#formatSelect');
+    selectForma.forEach(format => {
+        var takeout = format.textContent;
+        // console.log(takeout);
+    })
+    
+})
+
+// convertButton.addEventListener('click', () => {
+//     // var formats = Array.from(buttonClick).map(select => select);
+//     var tryy = selectForma.forEach(forma => {
+//         forma.textContent;
+//     }) 
+//     // var takeout = selectForma.textContent;
+
+// });
+
+
+const selectedFormats = [];
+
+convertButton.addEventListener('click', () => {
+    var files = fileInput.files;
+    // var formats = Array.from(formatSelects).map(select => select.textContent);
+    const selectForma = document.querySelectorAll('#formatSelect');
+
+    var formats = selectForma.forEach(format => {
+        const listFormats = format.textContent;
+        selectedFormats.push(listFormats);
+    });
+
+    console.log(selectedFormats);
+  
+    
+   
+
+    var formData = new FormData();
+    Array.from(files).forEach((file, index)=> {
+        formData.append('files', file);
+        // formData.append('formats', formats[index]);
+        formData.append('formats', selectedFormats[index]);
+    });
+
+    $.ajax({
+        type: 'POST', 
+        url: "/upload/",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(res) {
+            console.log('Data successfully transfer');
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    
+    });
+
+});
+
 
 
 
