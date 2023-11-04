@@ -44,7 +44,7 @@ function handleFilesSelected(){
     const selectFiles = [...fileIn.files];
     for (const f of selectFiles){
         // fileList.push(f);
-        // console.log(fileList);
+        // console.log('onchange ',f);
         const li = document.createElement('li');
         li.classList.add('file-list');
 
@@ -82,7 +82,7 @@ function handleFilesSelected(){
                                               <div class="format-inner">
                                                   <ul id="format-list">
                                                       <li class="current format-btn btn-secondary"><span>PNG</span></li>
-                                                      <li class="current format-btn btn-secondary"><span>GIF</span></li>
+                                                      <li class="current format-btn btn-secondary"><span>PDF</span></li>
                                                       <li class="current format-btn btn-secondary"><span>BEEP</span></li>
                                                       <li class="current format-btns btn-secondarys"><span>JPG</span></li>
                                                       
@@ -105,8 +105,9 @@ function handleFilesSelected(){
 
                           <div class="file-size">${insert}</div>
                           <div class="download-link">
-                              <a href="">Download</a>
+                            <a "{% url 'download'%}">Download</a>
                           </div>
+                          
                           <div class="close-button">
                               <i class="ri-close-line"></i>
                           </div>
@@ -190,14 +191,15 @@ function handleFilesSelected(){
           });
         };
 
-       
-        
     };
 }
 
+document.getElementById('file-input').addEventListener('change', handleFilesSelected, false);
 
 
-const fileInput = document.querySelector('#file-input');
+
+// const fileInput = document.querySelector('#file-input');
+const fileInput = document.getElementById('file-input');
 const formatSelects = document.querySelectorAll('.btn-button');
 const convertButton = document.querySelector('.convert');
 
@@ -205,13 +207,23 @@ const selectForma = document.getElementById('formatSelect');
 
 
 convertButton.addEventListener('click', ()=> {
-    const selectForma = document.querySelectorAll('#formatSelect');
-    selectForma.forEach(format => {
-        var takeout = format.textContent;
-        // console.log(takeout);
-    })
+    // const selectForma = document.querySelectorAll('#formatSelect');
+    // selectForma.forEach(format => {
+    //     var takeout = format.textContent;
+      
+    // })
     
 })
+
+fileInput.addEventListener('change', filefileHandle, false);
+const lisltlist = [];
+function filefileHandle() {
+    const fileLists = this.files;
+}
+
+
+
+
 
 // convertButton.addEventListener('click', () => {
 //     // var formats = Array.from(buttonClick).map(select => select);
@@ -225,43 +237,97 @@ convertButton.addEventListener('click', ()=> {
 
 const selectedFormats = [];
 
-convertButton.addEventListener('click', () => {
-    var files = fileInput.files;
-    // var formats = Array.from(formatSelects).map(select => select.textContent);
-    const selectForma = document.querySelectorAll('#formatSelect');
+// convertButton.addEventListener('click', () => {
+//     var files = fileInput.files;
+//     const selectForma = document.querySelectorAll('#formatSelect');
 
-    var formats = selectForma.forEach(format => {
-        const listFormats = format.textContent;
-        selectedFormats.push(listFormats);
-    });
+//     var formats = selectForma.forEach(format => {
+//         const listFormats = format.textContent;
+//         selectedFormats.push(listFormats);
+//     });
 
-    console.log(selectedFormats);
+//     console.log(selectedFormats);
   
     
-   
+//     var formData = new FormData();
+//     Array.from(files).forEach((file, index)=> {
+//         formData.append('files', file);
+//         // formData.append('formats', formats[index]);
+//         formData.append('formats', selectedFormats[index]);
+//     });
 
-    var formData = new FormData();
-    Array.from(files).forEach((file, index)=> {
-        formData.append('files', file);
-        // formData.append('formats', formats[index]);
-        formData.append('formats', selectedFormats[index]);
-    });
+//     $.ajax({
+//         type: 'POST', 
+//         url: "/upload/",
+//         data: formData,
+//         processData: false,
+//         contentType: false,
+//         success: function(res) {
+//             console.log('Data successfully transfer');
+//         },
+//         error: function(err) {
+//             console.log(err);
+//         }
+    
+//     });
+
+// });
+
+// const selectedFormats = [];
+
+
+convertButton.addEventListener('click', () => {
+    const formData = new FormData();
+    const selectFiles = [...fileIn.files];
+    console.log(selectFiles);
+    for(const file of selectFiles){
+        // console.log('update ', file.name);
+        // formData.append('files', file.name)
+        const filename = file.name
+        console.log(filename)
+        formData.append('files', file, filename)
+        // console.log(formData);
+    }
+
+    // console.log(selectFiles);
+    const files = fileInput.files;
+    // console.log(files);
+    const selectForma = document.querySelectorAll('#formatSelect');
+        
+    // Convert NodeList to an array and extract text content
+    const formats = Array.from(selectForma).map(format => format.textContent);
+
+    for(const format of formats) {
+        formData.append('formats', format)
+    }
+    // console.log(formData);
+
+   
+    // Array.from(files).forEach((file, index) => {
+    //     formData.append('files', file);
+    //     formData.append('formats', formats[index]);
+    // });
+        
+    // Array.from(files).forEach((file, index) => {
+    //     formData.set('files[' + index + ']', file);
+    //     const newFormats = [];
+    //     newFormats.push(formats[index]);
+    //     formData.append('formats[' + index + ']', newFormats);
+    // });
 
     $.ajax({
-        type: 'POST', 
+        type: 'POST',
         url: "/upload/",
         data: formData,
         processData: false,
         contentType: false,
         success: function(res) {
-            console.log('Data successfully transfer');
+            console.log('Data successfully transferred');
         },
         error: function(err) {
             console.log(err);
         }
-    
     });
-
 });
 
 
@@ -270,26 +336,10 @@ convertButton.addEventListener('click', () => {
 
 
 
-// Convert any File 
-function convertFiles(){
-    // Get the file types of the files in the file list
-    const fileTypes = fileList.map(file => file.type);
 
-    // Check if all files are PDF files
-    if(fileTypes.every(type => type === 'application/pdf')) {
-        // Convert the files to CSV files
-        const csvFiles = fileList.map(file => convertPDFToCSV(file));
-        console.log(csvFiles);
-        // Download the CSV files
-        // csvFiles.forEach(csvFile => downloadCSVFile(csvFile));
-     
-    } else {
-        console.log('The files you entered are not PDF ....');
-    }
-    
-}
 
-document.getElementById('file-input').addEventListener('change', handleFilesSelected, false);
+
+
 // document.querySelector('.convert').addEventListener('click', convertFiles);
 
 

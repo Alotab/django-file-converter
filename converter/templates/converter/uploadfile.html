@@ -50,15 +50,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
     <!-- <form action="{% url 'upload_file' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <label for="file">Choose file:</label>
@@ -73,9 +64,10 @@
     </form> -->
 
 
-    {% if converted_File %}
-    <a href="{% url 'download' converted_File %}" class="btn btn-primary">Download</a>
-    {% endif %}
+
+    <!-- {% if converted_File %}
+    <a href="{% url 'download' converted_File %}" class="btn-but">Download</a>
+    {% endif %} -->
 
     <!-- <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}

@@ -21,7 +21,7 @@ from PIL import Image
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from .utils import convert_file 
+from .utils import convert_file, upload_jpg
 from .forms import UploadFileForm
 from .models import File
 
@@ -30,15 +30,35 @@ from django import template
 
 @csrf_exempt
 def upload_file(request):
+    converted_File = None
     if request.method == "POST":
         files = request.FILES.getlist('files')
+        filenames = request.POST.getlist('filenames')
         formats = request.POST.getlist('formats')
-        print(formats)
+        print(filenames)
+        # print(formats)
 
-        for file, format in zip(files, formats):
-            print(file, format)
-    return render(request, 'converter/uploadfile.html')
+        # for file, format in zip(files, formats):
+            # filename = file.name
+    
+            # hii, file_extension = os.path.splitext(filename)
+            # print(f'convert to {format}')
+        # converted_File = upload_jpg(files,formats)
+            # print(converted_File)
+        converted_File = convert_file(files, formats)
+    return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
 
+
+@csrf_exempt
+def upload_filessssss(request):
+    converted_File = None
+    if request.method == "POST":
+        files = request.FILES.getlist('files')
+        filenames = request.POST.getlist('filenames')
+        formats = request.POST.getlist('formats')
+        converted_File = upload_jpg(files,formats)
+      
+    return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
 
 
 # def upload_file(request):

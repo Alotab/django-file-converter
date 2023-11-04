@@ -10,37 +10,65 @@ from reportlab.lib.pagesizes import letter,landscape,A4
 from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+# from django.core.files import File
 
-from django.core.files import File
+def convert_file(files, formats):
+    newFile = None
+    for file in files:
+        for format in formats:
+            filename = file.name
+            
+            # filename = filename.decode("utf-8")
+            _, file_extension = os.path.splitext(filename)
+            print(file_extension)
+            
+            if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
+                print('should be workinh')
+                newFile = upload_jpg(file, format)
+            elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
+                print('DONT WORK COS IF XLSX')
+                newFile = xlsx_to_pdf(file)
+                # newFile = xlsx_2_pdf(file)
+            else:
+                print(f'File extension {file_extension} is not supported for format {format}')
+                print('DONT WORK COS YOU HAVE NO FORMAT')
+
+    return newFile
 
 
-
-def upload_jpg(files, conversion, name):
+def upload_jpg(file, format):
     """
     This function converts the `.jpg` and `.jpeg` files into one `.pdf` file.
     """
     pdfFile = None
     merger = PdfMerger()
-    for file in files:
-        
-        im = Image.open(file)
-        
-        if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
-            im.load()
-            background = Image.new("RGB", im.size, (255, 255, 255))
-            background.paste(im, mask=im.split()[3])
-            im = background
 
-        # Create a temporary file with a unique name
-        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
-            # Save the image as a temporary PDF file
-            im.save(temp.name, 'PDF', encoding='latin-1')
+    # print(f"Number of files: {len(files)}")
+    # for file in files:
+        # print(file)
+    # print(f"Number of formats: {len(formats)}")
 
-            # Add the temporary PDF file to the merger
-            merger.append(temp.name)
+    # for file, format in zip(files, formats):
+
+    filename = file.name
+    name, _ = os.path.splitext(filename)
+
+    im = Image.open(file)
+        
+    if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
+        im.load()
+        background = Image.new("RGB", im.size, (255, 255, 255))
+        background.paste(im, mask=im.split()[3])
+        im = background
+
+    # Create a temporary file with a unique name and Save the image as a temporary PDF file.  Add the temporary PDF file to the merger
+    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
+        im.save(temp.name, 'PDF', encoding='latin-1')
+        merger.append(temp.name)
 
     # Save the merged PDF file
-    pdfFile = f"{name}.{conversion}"
+    format = format.lower()
+    pdfFile = f"{name}.{format}"
     # pdfFile = 'output.pdf'
     merger.write(pdfFile)
     merger.close()
@@ -48,71 +76,69 @@ def upload_jpg(files, conversion, name):
     # return File(open(pdfFile, 'rb'), name=pdfFile)
     
 
-def xlsx_to_pdf(files):
+def xlsx_to_pdf(file):
     """
         This function converts all excel files `.xlsx`, `.xlx` into `pdf`
     """
-
     pdfFile = "output.pdf"
-    for file in files:
-        print(file, '....................................................')
+    # for file in files:
+    print(file, '....................................................')
 
-        # load excel file
-        workbook = load_workbook(file)
+    # load excel file
+    workbook = load_workbook(file)
 
-        # get the current sheet
-        worksheet = workbook.active
+    # get the current sheet
+    worksheet = workbook.active
 
-        # Read the number of rows and columns in the current sheet
-        max_row = worksheet.max_row
-        max_column = worksheet.max_column
+    # Read the number of rows and columns in the current sheet
+    max_row = worksheet.max_row
+    max_column = worksheet.max_column
 
-        # set PDF canvas
-        c = canvas.Canvas(pdfFile, pagesize=landscape(A4))
+    # set PDF canvas
+    c = canvas.Canvas(pdfFile, pagesize=landscape(A4))
 
-        # set margins
-        top_margin = 3*inch
-        left_margin = 0.75*inch 
-        bottom_margin = 0.75*inch
-        right_margin = 0.75*inch
+    # set margins
+    top_margin = 3*inch
+    left_margin = 0.75*inch 
+    bottom_margin = 0.75*inch
+    right_margin = 0.75*inch
 
 
-        cell_width = (11*inch - left_margin - right_margin) / max_column
-        cell_height = (8.5*inch - top_margin - bottom_margin) / max_row
+    cell_width = (11*inch - left_margin - right_margin) / max_column
+    cell_height = (8.5*inch - top_margin - bottom_margin) / max_row
 
-        for row in range(1, max_row+1):
-            for column in range(1, max_column+1):
-                cell = worksheet.cell(row=row, column=column)
-                text=str(cell.value)
-                x = left_margin + (column -1) * cell_width
-                # y = 11*inch - (top_margin + max_row * cell_height)
-                y = 11*inch - (top_margin + row * cell_height)
-                c.drawString(x, y, text)
-    
-        # save PDF and close canvas
-        c.save()
+    for row in range(1, max_row+1):
+        for column in range(1, max_column+1):
+            cell = worksheet.cell(row=row, column=column)
+            text=str(cell.value)
+            x = left_margin + (column -1) * cell_width
+            # y = 11*inch - (top_margin + max_row * cell_height)
+            y = 11*inch - (top_margin + row * cell_height)
+            c.drawString(x, y, text)
+
+    # save PDF and close canvas
+    c.save()
+    print('Done conversion of .xls to pdf file')
     return pdfFile
 
 
-def convert_file(files, conversion):
-    newFile = None
+# def convert_file(files, formats):
+#     newFile = None
     
-    for file in files:
-        filename = file.name
-        # file = file.name.replace('\x00', '')
-        print(file)
-        hii, file_extension = os.path.splitext(filename)
-        print(hii)
-        # print(conversion)
-        if file_extension in ('.jpg', '.jpeg') and 'pdf' in conversion:
-            # newFile = upload_jpg(files)
-            newFile = upload_jpg(files, conversion, name=hii)
-        elif file_extension in ('.xlsx') and 'pdf' in conversion:
-            newFile = xlsx_to_pdf(files)
-        else:
-            print(f'File extension {file_extension} is not')
-
-    return newFile
+#     for file in files:
+#         filename = file.name
+#         # file = file.name.replace('\x00', '')
+#         # print(file)
+#         hii, file_extension = os.path.splitext(filename)
+#         # print(hii)
+#         # print(conversion)
+#         if file_extension in ('.jpg', '.jpeg') and 'pdf' in format:
+#             newFile = upload_jpg(files, formats)
+#         elif file_extension in ('.xlsx') and 'pdf' in format:
+#             newFile = xlsx_to_pdf(files)
+#         else:
+#             print(f'File extension {file_extension} is not')
+#     return newFile
 
 
 
@@ -120,36 +146,45 @@ def convert_file(files, conversion):
 
 
 
-# def xlsx_to_pdf(request):
-#     if request.method == 'POST':
-#         xlsxFiles = request.FILES.getlist('file')
 
-#         if not xlsxFiles:
-#             return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
 
-#         for xfile in xlsxFiles:
 
-#             # Read the data from the Excel file
-#             data = pd.read_excel(xfile)
+def xlsx_2_pdf(file):
+    # if request.method == 'POST':
+    #     xlsxFiles = request.FILES.getlist('file')
 
-#             # Create a PDF document
-#             pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
+    #     if not xlsxFiles:
+    #         return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
 
-#             # Create a table with the data
-#             tabel = Table(data.values)
+    #     for xfile in xlsxFiles:
 
-#             # Add some style to the table
-#             tabel.setStyle(TableStyle([
-#                 ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
-#                 ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
-#                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-#                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-#                 ('FONTSIZE', (0, 0), (-1, 0), 14),
-#                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-#                 ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
-#             ]))
+    # Read the data from the Excel file
+    data = pd.read_excel(file)
 
-#             # Add tabel to the PDF document
-#             pdfFile.build([tabel])
+    # Create a PDF document
+    pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
 
-#     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
+    # Create a table with the data
+    tabel = Table(data.values)
+
+    # Add some style to the table
+    tabel.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+        ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+    ]))
+
+    # Add tabel to the PDF document
+    pdfFile.build([tabel])
+
+    return pdfFile
+
+
+
+
+
+
