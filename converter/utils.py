@@ -11,6 +11,8 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 # from django.core.files import File
+import pandas
+import pdfkit
 
 def convert_file(files, formats):
     newFile = None
@@ -28,7 +30,6 @@ def convert_file(files, formats):
             elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
                 print('DONT WORK COS IF XLSX')
                 newFile = xlsx_to_pdf(file)
-                # newFile = xlsx_2_pdf(file)
             else:
                 print(f'File extension {file_extension} is not supported for format {format}')
                 print('DONT WORK COS YOU HAVE NO FORMAT')
@@ -77,6 +78,23 @@ def upload_jpg(file, format):
     
 
 def xlsx_to_pdf(file):
+    filename = file.name
+    name,_ = os.path.splitext(filename)
+    output = f'{name}.pdf'
+    
+    df = pd.read_excel(file)
+    df.to_html('file.html')
+    pdFile = pdfkit.from_file('file.html', output)
+
+    return pdFile
+
+
+
+
+
+
+
+def xlsx_tooo_pdf(file):
     """
         This function converts all excel files `.xlsx`, `.xlx` into `pdf`
     """
@@ -122,6 +140,7 @@ def xlsx_to_pdf(file):
     return pdfFile
 
 
+
 # def convert_file(files, formats):
 #     newFile = None
     
@@ -144,44 +163,39 @@ def xlsx_to_pdf(file):
 
 
 
+# def xlsx_2_pdf(file):
+#     # if request.method == 'POST':
+#     #     xlsxFiles = request.FILES.getlist('file')
 
+#     #     if not xlsxFiles:
+#     #         return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
 
+#     #     for xfile in xlsxFiles:
 
+#     # Read the data from the Excel file
+#     data = pd.read_excel(file)
 
+#     # Create a PDF document
+#     pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
 
-def xlsx_2_pdf(file):
-    # if request.method == 'POST':
-    #     xlsxFiles = request.FILES.getlist('file')
+#     # Create a table with the data
+#     tabel = Table(data.values)
 
-    #     if not xlsxFiles:
-    #         return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+#     # Add some style to the table
+#     tabel.setStyle(TableStyle([
+#         ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+#         ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+#         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+#         ('FONTSIZE', (0, 0), (-1, 0), 14),
+#         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#         ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+#     ]))
 
-    #     for xfile in xlsxFiles:
+#     # Add tabel to the PDF document
+#     pdfFile.build([tabel])
 
-    # Read the data from the Excel file
-    data = pd.read_excel(file)
-
-    # Create a PDF document
-    pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
-
-    # Create a table with the data
-    tabel = Table(data.values)
-
-    # Add some style to the table
-    tabel.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
-        ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
-    ]))
-
-    # Add tabel to the PDF document
-    pdfFile.build([tabel])
-
-    return pdfFile
+#     return pdfFile
 
 
 

@@ -87,6 +87,8 @@ function handleFilesSelected(){
                                                       <li class="current format-btns btn-secondarys"><span>JPG</span></li>
                                                       
                                                       <li class="current format-btns btn-secondarys"><span>JPEG</span></li>
+                                                      <li class="current format-btns btn-secondarys"><span>XLSX</span></li>
+                                                      <li class="current format-btns btn-secondarys"><span>XLS</span></li>
                                                   </ul>
                                               </div>
                                           </div>
