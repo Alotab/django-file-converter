@@ -46,6 +46,15 @@
     </div>
 
 
+    {% for converted_file in converted_container %}
+    <div class="converted-file">
+        <p>Original filename: {{ converted_file.original_filename}}</p>
+        <!-- <p>Converted filename: {{ converted_file.converted_filename }}</p> -->
+        <a href="{{ converted_file.download_url }}">Download converted file</a>
+    </div>
+    {% endfor %}
+
+
 
 
 

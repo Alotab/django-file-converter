@@ -3,6 +3,7 @@ from django.http import HttpResponse, FileResponse
 from django.contrib.auth.models import User
 from django.views.generic import ListView
 from django.http import FileResponse
+from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework import permissions
 from .models import uploadConverter
@@ -12,10 +13,6 @@ from django.views.decorators.csrf import csrf_exempt
 import csv
 import os
 
-# from io import BytesIO
-# from img2pdf import convert
-# from pdfkit import from_file
-import tempfile
 from PyPDF2 import PdfMerger
 from PIL import Image
 import pandas as pd
@@ -24,41 +21,112 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from .utils import convert_file, upload_jpg
 from .forms import UploadFileForm
 from .models import File
-
-
 from django import template
+import uuid
+import tempfile
+from django.core.files.temp import NamedTemporaryFile
+from django.conf import settings
+import io
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
+
+
 
 @csrf_exempt
 def upload_file(request):
     converted_File = None
-    if request.method == "POST":
-        files = request.FILES.getlist('files')
-        filenames = request.POST.getlist('filenames')
-        formats = request.POST.getlist('formats')
-        print(filenames)
-        # print(formats)
-
-        # for file, format in zip(files, formats):
-            # filename = file.name
+    converted_files = []
+    temp_dir = tempfile.TemporaryDirectory()
     
-            # hii, file_extension = os.path.splitext(filename)
-            # print(f'convert to {format}')
-        # converted_File = upload_jpg(files,formats)
-            # print(converted_File)
-        converted_File = convert_file(files, formats)
-    return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
-
-
-@csrf_exempt
-def upload_filessssss(request):
-    converted_File = None
     if request.method == "POST":
-        files = request.FILES.getlist('files')
-        filenames = request.POST.getlist('filenames')
+        uploaded_files = request.FILES.getlist('files')
         formats = request.POST.getlist('formats')
-        converted_File = upload_jpg(files,formats)
-      
+    
+        for file_object in uploaded_files:
+            for conversion_format in formats:
+                converted_File = convert_file(file_object, conversion_format)
+                # print('main conversion')
+                converted_file_object = io.StringIO(converted_File)
+
+
+                # generate a unique filename for the converted file 
+                filename = generate_unique_filename(file_object.name)
+
+                # Use the temporary directory to store uploaded files
+                # with tempfile.TemporaryDirectory() as temp_dir:
+                #     upload_file_path = os.path.join(temp_dir, filename)
+                #     with open(upload_file_path, 'wb') as f:
+                #         f.write(converted_file_object.read().encode())
+                uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+                if not os.path.exists(uploads_dir):
+                    os.makedirs(uploads_dir)
+
+                upload_file_path = os.path.join(uploads_dir,filename)
+                with open(upload_file_path, 'wb') as f:
+                    f.write(converted_file_object.read().encode())
+                    f.seek(0)
+
+                # Generate a download URL  for the converetd file 
+                download_url = reverse('download', kwargs={'filename': filename})
+
+                converted_file_info = {
+                    'original_filename': file_object.name,
+                    'converetd_filename': filename,
+                    'download_url': download_url,
+                    'temporary_file': uploads_dir,
+                }
+
+                converted_files.append(converted_file_info)
+
+                context = {
+                    'uploaded_files': uploaded_files,
+                    'converted_files': converted_files
+                }
+                return render(request, 'converter/uploadfile.html', context)
+                # return HttpResponse(request, 'converter/uploadfile.html', {'converted_File': converted_File})
     return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
+
+
+
+
+
+
+
+
+
+
+def generate_unique_filename(original_filename):
+    filename_base, filename_ext = os.path.splitext(original_filename)
+    unique_filename = f'{filename_base}_{uuid.uuid4()}{filename_ext}'
+    return unique_filename
+
+
+
+# @csrf_exempt
+# def upload_file(request):
+#     converted_File = None
+#     container = []
+#     if request.method == "POST":
+#         files = request.FILES.getlist('files')
+#         filenames = request.POST.getlist('filenames')
+#         formats = request.POST.getlist('formats')
+#         # print(filenames)
+#         converted_File = convert_file(files, formats)
+
+#     return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
+  
+
+
+# @csrf_exempt
+# def upload_filessssss(request):
+#     converted_File = None
+#     if request.method == "POST":
+#         files = request.FILES.getlist('files')
+#         filenames = request.POST.getlist('filenames')
+#         formats = request.POST.getlist('formats')
+#         converted_File = upload_jpg(files,formats)
+      
+#     return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
 
 
 # def upload_file(request):
@@ -172,19 +240,52 @@ class CsvFileList(ListView):
 
 #     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
+def download(request, filename):
+    uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+    # Retrieve the converted file from storage
+    fs = FileSystemStorage(location=uploads_dir)
+    converted_file = fs.open(filename)
 
-def download(request, converted_File):
+    # Set the appropriate response content type
+    extension = os.path.splitext(filename)[1]
+    content_type = {
+        '.pdf': 'application/pdf',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+        
+'.txt': 'text/plain',
+    }.get(extension, 'application/octet-stream')
+    response = HttpResponse(converted_file.read(), content_type=content_type)
+
+    # Set the Content-Disposition header to specify the filename
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
+
+
+
+
+def downloadsss(request, converted_File):
     """
-    This function allows the user to download the specified PDF file.
+    This function allows the user to download a converted file.
     """
     # Create a new FileResponse object
     response = FileResponse(open(converted_File, 'rb'))
 
     # Set the content type to 'application/pdf'
-    response['Content-Type'] = 'application/pdf'
+    extension = os.path.splitext(converted_File)[1]
+    content_type = {
+        '.pdf': 'application/pdf',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.txt': 'text/plain',
+    }.get(extension, 'application/octet-stream')
+    # response['Content-Type'] = 'application/pdf'
+    response['Content-Type'] = content_type
 
     # Set the content disposition to 'attachment' to trigger a download
-    response['Content-Disposition'] = f'attachment; filename="{converted_File}"'
+    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(converted_File)}"'
 
     return response
 

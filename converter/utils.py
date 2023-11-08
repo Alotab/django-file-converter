@@ -13,28 +13,50 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 # from django.core.files import File
 import pandas
 import pdfkit
+import tabula
 
-def convert_file(files, formats):
-    newFile = None
-    for file in files:
-        for format in formats:
-            filename = file.name
-            
-            # filename = filename.decode("utf-8")
-            _, file_extension = os.path.splitext(filename)
-            print(file_extension)
-            
-            if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
-                print('should be workinh')
-                newFile = upload_jpg(file, format)
-            elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
-                print('DONT WORK COS IF XLSX')
-                newFile = xlsx_to_pdf(file)
-            else:
-                print(f'File extension {file_extension} is not supported for format {format}')
-                print('DONT WORK COS YOU HAVE NO FORMAT')
 
-    return newFile
+def convert_file(file_object, conversion_format):
+    # filename = file_object.name
+    filename = 'another.jpg'
+    _, file_extension = os.path.splitext(filename)
+
+    converted_file = None
+
+    if file_extension in ('.jpg', '.jpeg') and conversion_format == 'PDF':
+        converted_file = upload_jpg(file_object, conversion_format)
+    elif file_extension in ('.xlsx', '.xls') and conversion_format == 'PDF':
+        converted_file = xlsx_to_pdf(file_object)
+    elif file_extension in ('.pdf') and conversion_format == 'CSV':
+        converted_file = pdf_to_csv(file_object)
+    else:
+        print(f'File extension {file_extension} is not supported for format {conversion_format}')
+
+    return converted_file
+
+# def convert_file(files, formats):
+#     newFile = None
+#     for file in files:
+#         for format in formats:
+#             filename = file.name
+            
+#             # filename = filename.decode("utf-8")
+#             _, file_extension = os.path.splitext(filename)
+#             print(file_extension)
+            
+#             if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
+#                 print('should be workinh')
+#                 newFile = upload_jpg(file, format)
+#             elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
+#                 print('DONT WORK COS IF XLSX')
+#                 newFile = xlsx_to_pdf(file)
+#             elif file_extension in ('.pdf') and format == 'CSV':
+#                 newFile = pdf_to_csv(file)
+#             else:
+#                 print(f'File extension {file_extension} is not supported for format {format}')
+#                 print('DONT WORK COS YOU HAVE NO FORMAT')
+
+#     return newFile
 
 
 def upload_jpg(file, format):
@@ -89,6 +111,13 @@ def xlsx_to_pdf(file):
     return pdFile
 
 
+def pdf_to_csv(file):
+    filename = file.name
+    name,_ = os.path.splitext(filename)
+    output = f'{name}.csv'
+
+    csvFile = tabula.convert_into(file, output)
+    return csvFile
 
 
 
@@ -138,6 +167,30 @@ def xlsx_tooo_pdf(file):
     c.save()
     print('Done conversion of .xls to pdf file')
     return pdfFile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
