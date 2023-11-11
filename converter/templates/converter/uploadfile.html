@@ -41,18 +41,29 @@
                 <i class="ri-refresh-line"></i>
                 <button class="converts"><p>Convert</p></button>
             </div>
+
+            
+            <div id="download-links" class="file-info">
+                <h1>DOWNLOAD</h1>
+                <p>Original filename: <span>James</span></p>
+                <ul>
+                    <li id="list-item"></li>
+                </ul>
+                
+            
+                <!-- {% for skull in student %}
+                    <p>filename: <span>{{ skull.name }}</span></p>
+                {% endfor %} -->
+
+
+            
+            </div>
+            
+         
+            
            
         </div>
     </div>
-
-
-    {% for converted_file in converted_container %}
-    <div class="converted-file">
-        <p>Original filename: {{ converted_file.original_filename}}</p>
-        <!-- <p>Converted filename: {{ converted_file.converted_filename }}</p> -->
-        <a href="{{ converted_file.download_url }}">Download converted file</a>
-    </div>
-    {% endfor %}
 
 
 

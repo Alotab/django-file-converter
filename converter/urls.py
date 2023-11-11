@@ -30,6 +30,7 @@ urlpatterns = [
 
     # try for download url matching
     path('download/<str:filename>/', views.download, name='download'),
+
     # path('download/<filename:path("([^/]+)")>/', views.download, name='download'),
     # path('download/<filename:[^/]+>/', views.download, name='download'),
     

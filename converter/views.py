@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.views.generic import ListView
 from django.http import FileResponse
@@ -12,6 +12,7 @@ from converter.permissions import IsOwnerOrReadOnly
 from django.views.decorators.csrf import csrf_exempt
 import csv
 import os
+import json
 
 from PyPDF2 import PdfMerger
 from PIL import Image
@@ -34,6 +35,64 @@ from django.core.files.storage import FileSystemStorage
 
 @csrf_exempt
 def upload_file(request):
+    json_context = None
+    converted_files = []
+    temp_dir = tempfile.TemporaryDirectory()
+
+    if request.method == "POST":
+        uploaded_files = request.FILES.getlist('files')
+        formats = request.POST.getlist('formats')
+
+        # Convert and save each file separately
+        for file_object, conversion_format in zip(uploaded_files, formats):
+            converted_file = convert_file(file_object, conversion_format)
+            # print(converted_file)
+
+            converted_file_object = io.StringIO(converted_file)
+
+            filename = generate_unique_filename(file_object.name)
+
+            uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+            if not os.path.exists(uploads_dir):
+                os.makedirs(uploads_dir)
+
+            upload_file_path = os.path.join(uploads_dir, filename)
+            # upload_file_path = os.path.join(uploads_dir, converted_file)
+            with open(upload_file_path, 'wb') as f:
+                f.write(converted_file_object.read().encode())
+                f.seek(0)
+
+            download_url = reverse('download', kwargs={'filename': filename})
+            
+
+            converted_file_info = {
+                'original_filename': file_object.name,
+                'converted_filename': filename,
+                'temporary_file': uploads_dir,
+                'converted_file': converted_file,
+            }
+
+            converted_files.append(converted_file_info)
+            # student = {"name": 'John', "age": 23, "sex": 'Female'}
+            context = {
+                'converted_files': converted_files
+            }
+            
+            # Serialize the context as a JSON object
+            json_context = json.dumps(context)
+
+        # Return the JSON context in the AJAX response
+        return JsonResponse(json_context, safe=False)
+        # return render(request, 'converter/uploadfile.html', context)
+    else:
+
+        context = {'converted_files': [],}
+        return render(request, 'converter/uploadfile.html', context)
+
+
+
+@csrf_exempt
+def upload_filess(request):
     converted_File = None
     converted_files = []
     temp_dir = tempfile.TemporaryDirectory()
@@ -41,22 +100,20 @@ def upload_file(request):
     if request.method == "POST":
         uploaded_files = request.FILES.getlist('files')
         formats = request.POST.getlist('formats')
+        print(f'upload files: {uploaded_files}')
+        print(f'upload formats: {formats}')
     
         for file_object in uploaded_files:
             for conversion_format in formats:
                 converted_File = convert_file(file_object, conversion_format)
-                # print('main conversion')
+                print(f'for file: {file_object}')
+                print(f'for formats: {conversion_format}')
                 converted_file_object = io.StringIO(converted_File)
 
 
                 # generate a unique filename for the converted file 
                 filename = generate_unique_filename(file_object.name)
 
-                # Use the temporary directory to store uploaded files
-                # with tempfile.TemporaryDirectory() as temp_dir:
-                #     upload_file_path = os.path.join(temp_dir, filename)
-                #     with open(upload_file_path, 'wb') as f:
-                #         f.write(converted_file_object.read().encode())
                 uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
                 if not os.path.exists(uploads_dir):
                     os.makedirs(uploads_dir)
@@ -67,17 +124,16 @@ def upload_file(request):
                     f.seek(0)
 
                 # Generate a download URL  for the converetd file 
-                download_url = reverse('download', kwargs={'filename': filename})
+                # download_url = reverse('download', kwargs={'filename': filename})
 
                 converted_file_info = {
                     'original_filename': file_object.name,
                     'converetd_filename': filename,
-                    'download_url': download_url,
+                    # 'download_url': download_url,
                     'temporary_file': uploads_dir,
                 }
 
                 converted_files.append(converted_file_info)
-
                 context = {
                     'uploaded_files': uploaded_files,
                     'converted_files': converted_files
@@ -85,11 +141,6 @@ def upload_file(request):
                 return render(request, 'converter/uploadfile.html', context)
                 # return HttpResponse(request, 'converter/uploadfile.html', {'converted_File': converted_File})
     return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
-
-
-
-
-
 
 
 

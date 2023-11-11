@@ -210,6 +210,11 @@ const selectForma = document.getElementById('formatSelect');
 
 
 convertButton.addEventListener('click', ()=> {
+    // document.getElementById('download-links').classList.toggle('hidden');
+    document.getElementById('download-links').classList.add('act');
+
+
+
     // const selectForma = document.querySelectorAll('#formatSelect');
     // selectForma.forEach(format => {
     //     var takeout = format.textContent;
@@ -284,8 +289,6 @@ convertButton.addEventListener('click', () => {
     const selectFiles = [...fileIn.files];
     console.log(selectFiles);
     for(const file of selectFiles){
-        // console.log('update ', file.name);
-        // formData.append('files', file.name)
         const filename = file.name
         console.log(filename)
         formData.append('files', file, filename)
@@ -303,20 +306,6 @@ convertButton.addEventListener('click', () => {
     for(const format of formats) {
         formData.append('formats', format)
     }
-    // console.log(formData);
-
-   
-    // Array.from(files).forEach((file, index) => {
-    //     formData.append('files', file);
-    //     formData.append('formats', formats[index]);
-    // });
-        
-    // Array.from(files).forEach((file, index) => {
-    //     formData.set('files[' + index + ']', file);
-    //     const newFormats = [];
-    //     newFormats.push(formats[index]);
-    //     formData.append('formats[' + index + ']', newFormats);
-    // });
 
     $.ajax({
         type: 'POST',
@@ -325,7 +314,21 @@ convertButton.addEventListener('click', () => {
         processData: false,
         contentType: false,
         success: function(res) {
-            console.log('Data successfully transferred');
+            // debugger;
+
+            var context = JSON.parse(res);
+            console.log(context);
+            var converted_file_name = context.converted_files[0].download_url;
+            document.getElementById('list-item').textContent = converted_file_name;
+
+    
+           
+
+        //    for(var i = 0; i < converted_files.length; i++){
+        //     var converted_file = converted_files[i];
+        //     console.log(converted_file)
+
+        //    }
         },
         error: function(err) {
             console.log(err);
