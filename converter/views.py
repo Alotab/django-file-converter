@@ -45,23 +45,26 @@ def upload_file(request):
 
         # Convert and save each file separately
         for file_object, conversion_format in zip(uploaded_files, formats):
-            converted_file = convert_file(file_object, conversion_format)
-            # print(converted_file)
+            # converted_file = convert_file(file_object, conversion_format)
+            filename= convert_file(file_object, conversion_format)
+            # converted_file_object = io.BytesIO(filename.encode())
+            # print(type(converted_file_object))
 
-            converted_file_object = io.StringIO(converted_file)
+            # converted_file_object = io.StringIO(converted_file)
 
-            filename = generate_unique_filename(file_object.name)
+            filename_cr = generate_unique_filename(file_object.name, conversion_format)
 
             uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
             if not os.path.exists(uploads_dir):
                 os.makedirs(uploads_dir)
 
-            upload_file_path = os.path.join(uploads_dir, filename)
+            upload_file_path = os.path.join(uploads_dir, filename_cr)
             # upload_file_path = os.path.join(uploads_dir, converted_file)
-            with open(upload_file_path, 'wb') as f:
-                f.write(converted_file_object.read().encode())
-                f.seek(0)
+            # with open(upload_file_path, 'wb') as f:
+            #     f.write(converted_file_object.read())
+            #     f.seek(0)
 
+            # download_url = reverse('download', kwargs={'filename': filename})
             download_url = reverse('download', kwargs={'filename': filename})
             
 
@@ -69,14 +72,15 @@ def upload_file(request):
                 'original_filename': file_object.name,
                 'converted_filename': filename,
                 'temporary_file': uploads_dir,
-                'converted_file': converted_file,
+                'download_url': download_url,
             }
 
             converted_files.append(converted_file_info)
-            # student = {"name": 'John', "age": 23, "sex": 'Female'}
+           
             context = {
                 'converted_files': converted_files
             }
+            print(context)
             
             # Serialize the context as a JSON object
             json_context = json.dumps(context)
@@ -144,11 +148,10 @@ def upload_filess(request):
 
 
 
-
-
-def generate_unique_filename(original_filename):
+def generate_unique_filename(original_filename, conversion_format):
+    conversion_format = conversion_format.lower()
     filename_base, filename_ext = os.path.splitext(original_filename)
-    unique_filename = f'{filename_base}_{uuid.uuid4()}{filename_ext}'
+    unique_filename = f'{filename_base}_{uuid.uuid4()}.{conversion_format}'
     return unique_filename
 
 
@@ -291,7 +294,7 @@ class CsvFileList(ListView):
 
 #     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
-def download(request, filename):
+def downloadSS(request, filename):
     uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
     # Retrieve the converted file from storage
     fs = FileSystemStorage(location=uploads_dir)
@@ -317,15 +320,15 @@ def download(request, filename):
 
 
 
-def downloadsss(request, converted_File):
+def download(request, filename):
     """
     This function allows the user to download a converted file.
     """
     # Create a new FileResponse object
-    response = FileResponse(open(converted_File, 'rb'))
+    response = FileResponse(open(filename, 'rb'))
 
     # Set the content type to 'application/pdf'
-    extension = os.path.splitext(converted_File)[1]
+    extension = os.path.splitext(filename)[1]
     content_type = {
         '.pdf': 'application/pdf',
         '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -336,7 +339,7 @@ def downloadsss(request, converted_File):
     response['Content-Type'] = content_type
 
     # Set the content disposition to 'attachment' to trigger a download
-    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(converted_File)}"'
+    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
     return response
 

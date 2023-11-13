@@ -317,9 +317,22 @@ convertButton.addEventListener('click', () => {
             // debugger;
 
             var context = JSON.parse(res);
-            console.log(context);
-            var converted_file_name = context.converted_files[0].download_url;
-            document.getElementById('list-item').textContent = converted_file_name;
+           
+            // var converted_file_name = context.converted_files[0].download_url;
+            // document.getElementById('list-item').textContent = converted_file_name;
+
+            // Get the download URL from the response
+            var downloadUrl = context.converted_files[0].download_url
+            console.log(downloadUrl);
+
+            // Create a new element to display the download link
+            var downloadLink = document.createElement('a');
+            downloadLink.href = downloadUrl;
+            downloadLink.textContent = 'DOWNLOAD';
+
+            // Append the download link to the DOM
+            // document.body.appendChild(downloadLink);
+            document.getElementById('list-item').appendChild(downloadLink)
 
     
            

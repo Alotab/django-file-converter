@@ -17,8 +17,8 @@ import tabula
 
 
 def convert_file(file_object, conversion_format):
-    # filename = file_object.name
-    filename = 'another.jpg'
+    filename = file_object.name
+    # filename = 'another.jpg'
     _, file_extension = os.path.splitext(filename)
 
     converted_file = None
@@ -99,7 +99,7 @@ def upload_jpg(file, format):
     # return File(open(pdfFile, 'rb'), name=pdfFile)
     
 
-def xlsx_to_pdf(file):
+def xlsx_to0000_pdf(file):
     filename = file.name
     name,_ = os.path.splitext(filename)
     output = f'{name}.pdf'
@@ -107,8 +107,23 @@ def xlsx_to_pdf(file):
     df = pd.read_excel(file)
     df.to_html('file.html')
     pdFile = pdfkit.from_file('file.html', output)
-
+    print(type(pdFile))
     return pdFile
+
+
+def xlsx_to_pdf(file):
+    filename = file.name
+    name,_ = os.path.splitext(filename)
+    output = f'{name}.pdf'
+    
+    df = pd.read_excel(file)
+    df.to_html('file.html')
+    pdfkit.from_file('file.html', output)
+    
+    with open(output, 'rb') as f:
+        pdf_file = f.read()
+    print(type(pdf_file))
+    return pdf_file
 
 
 def pdf_to_csv(file):
@@ -123,7 +138,7 @@ def pdf_to_csv(file):
 
 
 
-def xlsx_tooo_pdf(file):
+def xlsx_tooooo_pdf(file):
     """
         This function converts all excel files `.xlsx`, `.xlx` into `pdf`
     """
