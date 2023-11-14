@@ -320,19 +320,48 @@ convertButton.addEventListener('click', () => {
            
             // var converted_file_name = context.converted_files[0].download_url;
             // document.getElementById('list-item').textContent = converted_file_name;
+            console.log(context.converted_files);
 
-            // Get the download URL from the response
-            var downloadUrl = context.converted_files[0].download_url
-            console.log(downloadUrl);
+            var downloadUrls = context.converted_files.map(function(converted_File) {
+                return converted_File.download_url;
+            })
+            console.log(downloadUrls);
 
-            // Create a new element to display the download link
-            var downloadLink = document.createElement('a');
-            downloadLink.href = downloadUrl;
-            downloadLink.textContent = 'DOWNLOAD';
+            var originalFilename = context.converted_files.map(function(converted_File) {
+                return converted_File.original_filename;
+            })
+            console.log(originalFilename);
 
-            // Append the download link to the DOM
-            // document.body.appendChild(downloadLink);
-            document.getElementById('list-item').appendChild(downloadLink)
+            for (var i = 0; i < downloadUrls.length; i++) {
+                var downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrls[i];
+                downloadLink.textContent = 'Download converted file for ' + originalFilename[i];
+
+
+                document.getElementById('list-item').appendChild(downloadLink);
+
+                var convertedFile = document.createElement('a');
+                convertedFile.href = downloadUrls[i];
+                convertedFile.textContent = originalFilename[i];
+
+                document.getElementById('list-item').appendChild(convertedFile);
+            }
+
+
+
+
+
+
+            // // Get the download URL from the response
+            // var downloadUrl = context.converted_files[0].download_url;
+
+            // // Create a new element to display the download link
+            // var downloadLink = document.createElement('a');
+            // downloadLink.href = downloadUrl;
+            // downloadLink.textContent = 'DOWNLOAD';
+
+            // // Append the download link to the DOM
+            // document.getElementById('list-item').appendChild(downloadLink);
 
     
            
