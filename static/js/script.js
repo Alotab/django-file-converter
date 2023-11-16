@@ -1,8 +1,9 @@
 
-
 // const dropEl = document.querySelector(".drop-down");
 // const dropEl = document.querySelector(".drop-down");
 // const dropdownEl = document.querySelector('.drop-down-list');
+
+// const { node } = require("webpack");
 
 // dropEl.addEventListener('click', () => {
 //     console.log('hi');
@@ -50,7 +51,7 @@ function handleFilesSelected(){
 
         const insert = formatSizeUnits(f.size);
         li.innerHTML = `
-                          <div class="file-name-wrapper">
+                          <div class="file-name-wrapper" id=file-${f.name}>
                               <span class="file-name-icon"></span>
                               <p>${f.name}</p>
                           </div>
@@ -108,7 +109,6 @@ function handleFilesSelected(){
 
                           <div class="file-size">${insert}</div>
                           <div class="download-link">
-                            <a "{% url 'download'%}">Download</a>
                           </div>
                           
                           <div class="close-button">
@@ -123,7 +123,6 @@ function handleFilesSelected(){
         deleteButton.addEventListener('click', () => {
           li.remove();
         });
-
 
 
         const buttonClick = li.querySelector('.btn-button');
@@ -213,7 +212,8 @@ convertButton.addEventListener('click', ()=> {
     // document.getElementById('download-links').classList.toggle('hidden');
     document.getElementById('download-links').classList.add('act');
 
-
+    // console.log(this.crypto.randomUUID());
+    // console.log('hi');
 
     // const selectForma = document.querySelectorAll('#formatSelect');
     // selectForma.forEach(format => {
@@ -241,62 +241,105 @@ function filefileHandle() {
 //     // var takeout = selectForma.textContent;
 
 // });
+// const selectedFormats = [];
 
-
-const selectedFormats = [];
 
 // convertButton.addEventListener('click', () => {
-//     var files = fileInput.files;
+//     const formData = new FormData();
+//     const selectFiles = [...fileIn.files];
+//     for(const file of selectFiles){
+//         const fielId = uuid();
+//         fileIds.push(fielId)
+//         const filename = file.name
+//         formData.append('files', file, filename, fielId)
+//         console.log(formData);
+//     }
+
+//     // console.log(selectFiles);
+//     const files = fileInput.files;
+//     // console.log(files);
 //     const selectForma = document.querySelectorAll('#formatSelect');
+        
+//     // Convert NodeList to an array and extract text content
+//     const formats = Array.from(selectForma).map(format => format.textContent);
 
-//     var formats = selectForma.forEach(format => {
-//         const listFormats = format.textContent;
-//         selectedFormats.push(listFormats);
-//     });
-
-//     console.log(selectedFormats);
-  
-    
-//     var formData = new FormData();
-//     Array.from(files).forEach((file, index)=> {
-//         formData.append('files', file);
-//         // formData.append('formats', formats[index]);
-//         formData.append('formats', selectedFormats[index]);
-//     });
+//     for(const format of formats) {
+//         formData.append('formats', format)
+//     }
 
 //     $.ajax({
-//         type: 'POST', 
+//         type: 'POST',
 //         url: "/upload/",
 //         data: formData,
 //         processData: false,
 //         contentType: false,
 //         success: function(res) {
-//             console.log('Data successfully transfer');
+//             // debugger;
+
+//             var context = JSON.parse(res);
+
+//             var downloadUrls = context.converted_files.map(function(converted_File) {
+//                 return converted_File.download_url;
+//             })
+//             // console.log(downloadUrls);
+
+//             var originalFilename = context.converted_files.map(function(converted_File) {
+//                 return converted_File.original_filename;
+//             })
+//             // console.log(originalFilename);
+
+//             for (var i = 0; i < downloadUrls.length; i++) {
+//                 var downloadLink = document.createElement('p');
+//                 // downloadLink.href = downloadUrls[i];
+//                 downloadLink.textContent = originalFilename[i];
+
+
+//                 document.querySelector('.file-name-wrapper').appendChild(downloadLink);
+
+//                 var convertedFile = document.createElement('a');
+//                 convertedFile.href = downloadUrls[i];
+//                 // convertedFile.textContent = originalFilename[i];
+//                 convertedFile.textContent = 'Download';
+
+//                 document.querySelector('.download-link').appendChild(convertedFile);
+//             }
+
+//             // <a "{% url 'download'%}">Download</a>
 //         },
 //         error: function(err) {
 //             console.log(err);
 //         }
-    
 //     });
-
 // });
 
-// const selectedFormats = [];
+// id=name-file
 
 
-convertButton.addEventListener('click', () => {
-    const formData = new FormData();
+
+const fileIds = [];
+const formData = new FormData();
+convertButton.addEventListener('click', (event) => {
+    event.preventDefault();
+
     const selectFiles = [...fileIn.files];
-    console.log(selectFiles);
     for(const file of selectFiles){
-        const filename = file.name
-        console.log(filename)
-        formData.append('files', file, filename)
+        const filename = file.name;
+        console.log(filename);
+        formData.append('files', file, filename);
+
+        // unique uuid
+        const fileId = `${filename}_` + Math.floor((Math.random() * 1000000) + 1);
+
+        const fileDiv = document.getElementById(`file-${filename}`);
+        fileDiv.dataset.fileId = fileId;
+
+        formData.append('uuid', fileId);
         // console.log(formData);
     }
 
     // console.log(selectFiles);
     const files = fileInput.files;
+    
     // console.log(files);
     const selectForma = document.querySelectorAll('#formatSelect');
         
@@ -304,8 +347,10 @@ convertButton.addEventListener('click', () => {
     const formats = Array.from(selectForma).map(format => format.textContent);
 
     for(const format of formats) {
-        formData.append('formats', format)
+        formData.append('formats', format);
     }
+
+  
 
     $.ajax({
         type: 'POST',
@@ -317,66 +362,42 @@ convertButton.addEventListener('click', () => {
             // debugger;
 
             var context = JSON.parse(res);
-           
-            // var converted_file_name = context.converted_files[0].download_url;
-            // document.getElementById('list-item').textContent = converted_file_name;
-            console.log(context.converted_files);
+            console.log(context);
 
             var downloadUrls = context.converted_files.map(function(converted_File) {
                 return converted_File.download_url;
             })
-            console.log(downloadUrls);
+            // console.log(downloadUrls);
 
             var originalFilename = context.converted_files.map(function(converted_File) {
                 return converted_File.original_filename;
             })
-            console.log(originalFilename);
+            // console.log(originalFilename);
 
             for (var i = 0; i < downloadUrls.length; i++) {
-                var downloadLink = document.createElement('a');
-                downloadLink.href = downloadUrls[i];
-                downloadLink.textContent = 'Download converted file for ' + originalFilename[i];
+                var downloadLink = document.createElement('p');
+                // downloadLink.href = downloadUrls[i];
+                downloadLink.textContent = originalFilename[i];
 
 
-                document.getElementById('list-item').appendChild(downloadLink);
+                // document.querySelector('.file-name-wrapper').appendChild(downloadLink);
 
                 var convertedFile = document.createElement('a');
                 convertedFile.href = downloadUrls[i];
-                convertedFile.textContent = originalFilename[i];
+                // convertedFile.textContent = originalFilename[i];
+                convertedFile.textContent = 'Download';
 
-                document.getElementById('list-item').appendChild(convertedFile);
+                document.querySelector('.download-link').appendChild(convertedFile);
             }
 
-
-
-
-
-
-            // // Get the download URL from the response
-            // var downloadUrl = context.converted_files[0].download_url;
-
-            // // Create a new element to display the download link
-            // var downloadLink = document.createElement('a');
-            // downloadLink.href = downloadUrl;
-            // downloadLink.textContent = 'DOWNLOAD';
-
-            // // Append the download link to the DOM
-            // document.getElementById('list-item').appendChild(downloadLink);
-
-    
-           
-
-        //    for(var i = 0; i < converted_files.length; i++){
-        //     var converted_file = converted_files[i];
-        //     console.log(converted_file)
-
-        //    }
+            // <a "{% url 'download'%}">Download</a>
         },
         error: function(err) {
             console.log(err);
         }
     });
 });
+
 
 
 

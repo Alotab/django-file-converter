@@ -785,3 +785,7 @@ input:active, input:focus{
 .file-info a{
     color: #f06ea9;
 }
+
+.donwload-list li{
+    margin-top: 1rem;
+}

@@ -38,13 +38,13 @@ def upload_file(request):
     json_context = None
     converted_files = []
     temp_dir = tempfile.TemporaryDirectory()
-
     if request.method == "POST":
         uploaded_files = request.FILES.getlist('files')
         formats = request.POST.getlist('formats')
+        uuid = request.POST.getlist('uuid')
 
         # Convert and save each file separately
-        for file_object, conversion_format in zip(uploaded_files, formats):
+        for file_object, conversion_format, uuid in zip(uploaded_files, formats, uuid):
             # converted_file = convert_file(file_object, conversion_format)
             filename= convert_file(file_object, conversion_format)
             # converted_file_object = io.BytesIO(filename.encode())
@@ -73,6 +73,7 @@ def upload_file(request):
                 'converted_filename': filename,
                 'temporary_file': uploads_dir,
                 'download_url': download_url,
+                'uuid': uuid,
             }
 
             converted_files.append(converted_file_info)
@@ -80,7 +81,7 @@ def upload_file(request):
             context = {
                 'converted_files': converted_files
             }
-            print(context)
+            # print(context)
             
             # Serialize the context as a JSON object
             json_context = json.dumps(context)
@@ -89,7 +90,6 @@ def upload_file(request):
         return JsonResponse(json_context, safe=False)
         # return render(request, 'converter/uploadfile.html', context)
     else:
-
         context = {'converted_files': [],}
         return render(request, 'converter/uploadfile.html', context)
 
