@@ -1,39 +1,8 @@
 
-// const dropEl = document.querySelector(".drop-down");
-// const dropEl = document.querySelector(".drop-down");
-// const dropdownEl = document.querySelector('.drop-down-list');
-
-// const { node } = require("webpack");
-
-// dropEl.addEventListener('click', () => {
-//     console.log('hi');
-//     dropdownEl.classList.add('active');
-
-
-//     document.addEventListener('mousedown', (e) => {
-//         e.preventDefault();
-//         dropdownEl.classList.remove('active');
-//     });
-  
-// })
-
-
-
-
-
-
-
-
-
-
-
 
 
 //======================PROCESS FILES ============================//
-// const filename = files.name;
-// const filesize = files.size;
-// const realsizeMegabyte = filesize / 1048576;
-// const realsizekb = filesize / 1024;
+// `handleFilesSelected` function displays all the files uploaded by the user to the screen
 
 
 const fileIn = document.getElementById('file-input');
@@ -194,7 +163,7 @@ function handleFilesSelected(){
         };
 
     };
-}
+};
 
 document.getElementById('file-input').addEventListener('change', handleFilesSelected, false);
 
@@ -231,8 +200,6 @@ function filefileHandle() {
 
 
 
-
-
 // convertButton.addEventListener('click', () => {
 //     // var formats = Array.from(buttonClick).map(select => select);
 //     var tryy = selectForma.forEach(forma => {
@@ -241,81 +208,36 @@ function filefileHandle() {
 //     // var takeout = selectForma.textContent;
 
 // });
-// const selectedFormats = [];
-
-
-// convertButton.addEventListener('click', () => {
-//     const formData = new FormData();
-//     const selectFiles = [...fileIn.files];
-//     for(const file of selectFiles){
-//         const fielId = uuid();
-//         fileIds.push(fielId)
-//         const filename = file.name
-//         formData.append('files', file, filename, fielId)
-//         console.log(formData);
-//     }
-
-//     // console.log(selectFiles);
-//     const files = fileInput.files;
-//     // console.log(files);
-//     const selectForma = document.querySelectorAll('#formatSelect');
-        
-//     // Convert NodeList to an array and extract text content
-//     const formats = Array.from(selectForma).map(format => format.textContent);
-
-//     for(const format of formats) {
-//         formData.append('formats', format)
-//     }
-
-//     $.ajax({
-//         type: 'POST',
-//         url: "/upload/",
-//         data: formData,
-//         processData: false,
-//         contentType: false,
-//         success: function(res) {
-//             // debugger;
-
-//             var context = JSON.parse(res);
-
-//             var downloadUrls = context.converted_files.map(function(converted_File) {
-//                 return converted_File.download_url;
-//             })
-//             // console.log(downloadUrls);
-
-//             var originalFilename = context.converted_files.map(function(converted_File) {
-//                 return converted_File.original_filename;
-//             })
-//             // console.log(originalFilename);
-
-//             for (var i = 0; i < downloadUrls.length; i++) {
-//                 var downloadLink = document.createElement('p');
-//                 // downloadLink.href = downloadUrls[i];
-//                 downloadLink.textContent = originalFilename[i];
-
-
-//                 document.querySelector('.file-name-wrapper').appendChild(downloadLink);
-
-//                 var convertedFile = document.createElement('a');
-//                 convertedFile.href = downloadUrls[i];
-//                 // convertedFile.textContent = originalFilename[i];
-//                 convertedFile.textContent = 'Download';
-
-//                 document.querySelector('.download-link').appendChild(convertedFile);
-//             }
-
-//             // <a "{% url 'download'%}">Download</a>
-//         },
-//         error: function(err) {
-//             console.log(err);
-//         }
-//     });
-// });
-
-// id=name-file
 
 
 
+// Apppends the converetd file to the download-link class to the original file div
+function appendDownloadLink(fileId, downloadUrl) {
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = downloadUrl;
+    downloadLink.textContent = 'Download';
+   
+
+    // const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
+    // if(parentDiv) {
+    //     const downloadEl = parentDiv.querySelector('.download-link');
+    //     downloadEl.appendChild(downloadLink);
+    // }
+    const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
+
+    if (parentDiv) {
+      const downloadElement = parentDiv.querySelectorAll('.download-link');
+      if (downloadElement.length > 0) {
+        downloadElement[0].appendChild(downloadLink);
+      }
+    }
+
+  
+}
+
+// AJAX code sends uploaded file data (formData) to the django backend view function and returns a `response`
+// Process response to display converted file on the screen for user download
 const fileIds = [];
 const formData = new FormData();
 convertButton.addEventListener('click', (event) => {
@@ -324,23 +246,22 @@ convertButton.addEventListener('click', (event) => {
     const selectFiles = [...fileIn.files];
     for(const file of selectFiles){
         const filename = file.name;
-        console.log(filename);
         formData.append('files', file, filename);
 
         // unique uuid
         const fileId = `${filename}_` + Math.floor((Math.random() * 1000000) + 1);
 
         const fileDiv = document.getElementById(`file-${filename}`);
-        fileDiv.dataset.fileId = fileId;
+        if(fileDiv) {
+            fileDiv.dataset.fileId = fileId;
+        }
+        
 
         formData.append('uuid', fileId);
         // console.log(formData);
     }
 
-    // console.log(selectFiles);
     const files = fileInput.files;
-    
-    // console.log(files);
     const selectForma = document.querySelectorAll('#formatSelect');
         
     // Convert NodeList to an array and extract text content
@@ -351,7 +272,6 @@ convertButton.addEventListener('click', (event) => {
     }
 
   
-
     $.ajax({
         type: 'POST',
         url: "/upload/",
@@ -362,35 +282,35 @@ convertButton.addEventListener('click', (event) => {
             // debugger;
 
             var context = JSON.parse(res);
-            console.log(context);
+            // console.log(context);
+            if(context){
+                var downloadUrls = context.converted_files.map(function(converted_File) {
+                    return converted_File.download_url;
+                });
+        
+    
+                var originalFilename = context.converted_files.map(function(converted_File) {
+                    return converted_File.original_filename;
+                });
 
-            var downloadUrls = context.converted_files.map(function(converted_File) {
-                return converted_File.download_url;
-            })
-            // console.log(downloadUrls);
-
-            var originalFilename = context.converted_files.map(function(converted_File) {
-                return converted_File.original_filename;
-            })
-            // console.log(originalFilename);
-
-            for (var i = 0; i < downloadUrls.length; i++) {
-                var downloadLink = document.createElement('p');
-                // downloadLink.href = downloadUrls[i];
-                downloadLink.textContent = originalFilename[i];
+                for (const convertedFile of context.converted_files) {
+                    appendDownloadLink(convertedFile.uuid, convertedFile.download_url);
+                };
 
 
-                // document.querySelector('.file-name-wrapper').appendChild(downloadLink);
+                for (var i = 0; i < downloadUrls.length; i++) {
+                    var downloadLink = document.createElement('p');
+                    // downloadLink.href = downloadUrls[i];
+                    downloadLink.textContent = originalFilename[i];
+                };
+            };
 
-                var convertedFile = document.createElement('a');
-                convertedFile.href = downloadUrls[i];
-                // convertedFile.textContent = originalFilename[i];
-                convertedFile.textContent = 'Download';
+        
+           
 
-                document.querySelector('.download-link').appendChild(convertedFile);
-            }
+           
+              
 
-            // <a "{% url 'download'%}">Download</a>
         },
         error: function(err) {
             console.log(err);
@@ -399,96 +319,70 @@ convertButton.addEventListener('click', (event) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-// document.querySelector('.convert').addEventListener('click', convertFiles);
-
-
-// Convert PDF -> CSV
-async function convertPDFToCSV(file){
-    const csvFile = new Blob([file], {'type': 'application/csv'});
-    // console.log(csvFile);
-   
-    // Download the CSV file
-    return csvFile;
-}
-
-function downloadCSVFile(csvFile) {
-    // get filename
-    const filename = csvFile.name;
-
-    // Create a link to download the CSVFile
-    const donwloadLinkParent = document.querySelector('.download-link');
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(csvFile);
-    link.download = filename;
-
-    donwloadLinkParent.appendChild(link);
-
-    link.click();
-}
-
+// converts file sizes from bytes to megabytes, kilibytes and gigabytes
 function formatSizeUnits(bytes) {
-  if (bytes >= 1073741824) {
-      bytes = (bytes / 1073741824).toFixed(2) + " GB";
-  } else if (bytes >= 1048576) {
-      bytes = (bytes / 1048576).toFixed(2) + " MB";
-  } else if (bytes >= 1024) {
-      bytes = (bytes / 1024).toFixed(2) + " KB";
-  } else if (bytes > 1) {
-      bytes = bytes + " bytes";
-  } else if (bytes == 1) {
-      bytes = bytes + " byte";
-  } else {
-      bytes = "0 bytes";
-  }
-  return bytes;
+    if (bytes >= 1073741824) {
+        bytes = (bytes / 1073741824).toFixed(2) + " GB";
+    } else if (bytes >= 1048576) {
+        bytes = (bytes / 1048576).toFixed(2) + " MB";
+    } else if (bytes >= 1024) {
+        bytes = (bytes / 1024).toFixed(2) + " KB";
+    } else if (bytes > 1) {
+        bytes = bytes + " bytes";
+    } else if (bytes == 1) {
+        bytes = bytes + " byte";
+    } else {
+        bytes = "0 bytes";
+    }
+    return bytes;
 }
-
+  
+  
+// Assigns units to the filesize `MB`, `GB`, `KB`
 function checkFileSize(f){
-  const file = document.querySelector('#file-input').files[0];
-
-  const fileSizeInBytes = f.size
-  // const fileSizeInBytes = file.size;
-
-  const fileSizeInKBOrMB = fileSizeInBytes < 1024 ? fileSizeInBytes / 1024 : fileSizeInBytes / (1024 * 1024);
-
-  const roundedFileSizeInKBOrMB = Math.ceil(fileSizeInKBOrMB);
-  console.log("rounded ", roundedFileSizeInKBOrMB);
-
-  // const fileSizeElement = li.querySelector('.file-size');
-  const fileSizeElement = document.querySelector('.file-size');
-  const insertAllo = `${roundedFileSizeInKBOrMB} ${fileSizeInBytes < 1024 ? 'KB' : 'MB'}`
-
-  fileSizeElement.textContent = insertAllo;
-
-
-
+    const file = document.querySelector('#file-input').files[0];
+  
+    const fileSizeInBytes = f.size;
+  
+    const fileSizeInKBOrMB = fileSizeInBytes < 1024 ? fileSizeInBytes / 1024 : fileSizeInBytes / (1024 * 1024);
+  
+    const roundedFileSizeInKBOrMB = Math.ceil(fileSizeInKBOrMB);
+    console.log("rounded ", roundedFileSizeInKBOrMB);
+  
+    const fileSizeElement = document.querySelector('.file-size');
+    const insertAllo = `${roundedFileSizeInKBOrMB} ${fileSizeInBytes < 1024 ? 'KB' : 'MB'}`
+  
+    fileSizeElement.textContent = insertAllo;
 }
-
-// const buttonClick = li.querySelector('.btn-button');
-const activateDrop = document.querySelector('.dropdown-menu');
-// const formatItems = li.querySelector('#format-list');
-
-// if(buttonClick){
-//     buttonClick.addEventListener('click', () => {
-//       activateDrop.classList.add('activate');
-//     });
-// };
+  
 
 
 
 
-// buttonClick.addEventListener('click', () => {
-//     //       activateDrop.classList.add('activate');
+
+
+
+
+
+
+
+
+// function downloadCSVFile(csvFile) {
+//     // get filename
+//     const filename = csvFile.name;
+
+//     // Create a link to download the CSVFile
+//     const donwloadLinkParent = document.querySelector('.download-link');
+//     const link = document.createElement('a');
+//     link.href = URL.createObjectURL(csvFile);
+//     link.download = filename;
+
+//     donwloadLinkParent.appendChild(link);
+
+//     link.click();
+// }
+
+
 
 
 
