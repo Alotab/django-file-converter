@@ -217,24 +217,22 @@ function appendDownloadLink(fileId, downloadUrl) {
     const downloadLink = document.createElement('a');
     downloadLink.href = downloadUrl;
     downloadLink.textContent = 'Download';
-   
 
-    // const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
-    // if(parentDiv) {
-    //     const downloadEl = parentDiv.querySelector('.download-link');
-    //     downloadEl.appendChild(downloadLink);
-    // }
-    const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
+    try {
+        const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
+        const downloadEl = parentDiv.querySelector('.download-link');
 
-    if (parentDiv) {
-      const downloadElement = parentDiv.querySelectorAll('.download-link');
-      if (downloadElement.length > 0) {
-        downloadElement[0].appendChild(downloadLink);
-      }
-    }
+        if(parentDiv) {
+            if(!downloadEl.querySelector('a')) {
+                downloadEl.appendChild(downloadLink);
+            } 
+        }
 
-  
+    } catch (error) {
+        // console.log("parentDiv is empty");
+    };
 }
+
 
 // AJAX code sends uploaded file data (formData) to the django backend view function and returns a `response`
 // Process response to display converted file on the screen for user download
@@ -256,7 +254,6 @@ convertButton.addEventListener('click', (event) => {
             fileDiv.dataset.fileId = fileId;
         }
         
-
         formData.append('uuid', fileId);
         // console.log(formData);
     }
@@ -294,23 +291,12 @@ convertButton.addEventListener('click', (event) => {
                 });
 
                 for (const convertedFile of context.converted_files) {
-                    appendDownloadLink(convertedFile.uuid, convertedFile.download_url);
-                };
+                    if(convertedFile.converted_filename !== null){
+                        appendDownloadLink(convertedFile.uuid, convertedFile.download_url);
 
-
-                for (var i = 0; i < downloadUrls.length; i++) {
-                    var downloadLink = document.createElement('p');
-                    // downloadLink.href = downloadUrls[i];
-                    downloadLink.textContent = originalFilename[i];
+                    }
                 };
             };
-
-        
-           
-
-           
-              
-
         },
         error: function(err) {
             console.log(err);
