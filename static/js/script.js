@@ -26,7 +26,7 @@ function handleFilesSelected(){
                           </div>
                         
                           <div class="select-conversion-container">
-                              <span>to</span>
+                          <!--    <span>to</span> -->
                               <div class="conversion">
                                   <button class="btn-button btn-caret btn btn-sm btn-outline-dark" id="formatSelect"></button>
                                   <!-- <div class="select-convertor"> -->
@@ -172,14 +172,39 @@ document.getElementById('file-input').addEventListener('change', handleFilesSele
 // const fileInput = document.querySelector('#file-input');
 const fileInput = document.getElementById('file-input');
 const formatSelects = document.querySelectorAll('.btn-button');
+const formatSele = document.querySelector('.btn-button');
 const convertButton = document.querySelector('.convert');
 
 const selectForma = document.getElementById('formatSelect');
 
+// const removeFormatSelector = document.querySelector('.btn');
+
+
+
+
+
+
 
 convertButton.addEventListener('click', ()=> {
+
+
+    // observer.takeRecords();
+
+    // removeFormatSelector.style.display = 'none';
+    // console.log('hideen');
+    // console.log(convertButton);
+    // console.log(removeFormatSelector);
+    // if(removeFormatSelector) {
+    //     // removeFormatSelector.classList.add('hidden');
+    //     console.log(removeFormatSelector);
+        
+    // }
+   
+
+
     // document.getElementById('download-links').classList.toggle('hidden');
-    document.getElementById('download-links').classList.add('act');
+
+    // document.getElementById('download-links').classList.add('act');
 
     // console.log(this.crypto.randomUUID());
     // console.log('hi');
@@ -211,6 +236,18 @@ function filefileHandle() {
 
 
 
+// This function loops through all the format buttons
+// Checks and remove a button if a selected format has been assigned to it after conversion is done
+function checkElementContent(elements) {
+    for (const ele of elements){
+        if(ele.textContent){
+            ele.style.display = "none";
+        };
+    };
+}
+
+
+
 // Apppends the converetd file to the download-link class to the original file div
 function appendDownloadLink(fileId, downloadUrl) {
 
@@ -221,11 +258,28 @@ function appendDownloadLink(fileId, downloadUrl) {
     try {
         const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
         const downloadEl = parentDiv.querySelector('.download-link');
+        const removeFormatContainer = document.querySelectorAll('.btn');
+
+        const checkStatus = document.querySelectorAll('.file-list');
+        const statusSpinReady = document.querySelector('.status .spining-ready')
+        const statusSpinFinish = document.querySelector('.status .spining-finish')
+      
 
         if(parentDiv) {
             if(!downloadEl.querySelector('a')) {
                 downloadEl.appendChild(downloadLink);
             } 
+
+            checkElementContent(removeFormatContainer);
+        }
+
+        for(const lisst of checkStatus) {
+            const lii = lisst.querySelector('.download-link a');
+            if(lii) {
+                statusSpinReady.style.display = "none";
+                statusSpinFinish.style.display = "block";
+            }
+            
         }
 
     } catch (error) {
@@ -303,6 +357,8 @@ convertButton.addEventListener('click', (event) => {
         }
     });
 });
+
+
 
 
 // converts file sizes from bytes to megabytes, kilibytes and gigabytes

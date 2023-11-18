@@ -365,6 +365,7 @@ input[type="file"] {
     margin-right: 10px;
 }
 .btn-button {
+   
     height: 32px;
     /* width: auto; */
     min-width: 65px !important;
@@ -394,7 +395,6 @@ input[type="file"] {
 }
 
 .btn {
-    /* display: inline-block; */
     display: flex;
     font-weight: 400;
     /* color: #333; */
@@ -408,6 +408,7 @@ input[type="file"] {
     line-height: 1.6;
     border-radius: 4px;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+   
 }
 
 button, input {
@@ -477,7 +478,7 @@ button {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 .enclose span{
     display: none;
@@ -545,8 +546,6 @@ button {
     padding: 0.5px 3px;
     border: 1px solid green;
     border-radius: 0.2rem;
-    
- 
 }
 .status i{
     color: #f06ea9;
@@ -770,7 +769,7 @@ input:active, input:focus{
 
 /* file donwload section  */
 
-.file-info {
+/* .file-info {
     margin-top: 2rem;
     padding: 1rem;
     background: green;
@@ -788,4 +787,4 @@ input:active, input:focus{
 
 .donwload-list li{
     margin-top: 1rem;
-}
+} */
