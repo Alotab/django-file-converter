@@ -17,6 +17,9 @@ function handleFilesSelected(){
         // console.log('onchange ',f);
         const li = document.createElement('li');
         li.classList.add('file-list');
+        // li.id = `${f.name}-moses`;
+
+    
 
         const insert = formatSizeUnits(f.size);
         li.innerHTML = `
@@ -257,35 +260,50 @@ function appendDownloadLink(fileId, downloadUrl) {
 
     try {
         const parentDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentNode;
+        const parentFileDiv = document.querySelector(`[data-file-id="${fileId}"]`).parentElement;
         const downloadEl = parentDiv.querySelector('.download-link');
-        const removeFormatContainer = document.querySelectorAll('.btn');
 
-        const checkStatus = document.querySelectorAll('.file-list');
-        const statusSpinReady = document.querySelector('.status .spining-ready')
-        const statusSpinFinish = document.querySelector('.status .spining-finish')
+
+
+        // const removeFormatContainer = document.querySelectorAll('.btn');
+        // const checkStatus = document.querySelectorAll('.file-list');
+        // const statusSpinReady = document.querySelector('.status .spining-ready')
+        // const statusSpinFinish = document.querySelector('.status .spining-finish')
       
 
         if(parentDiv) {
             if(!downloadEl.querySelector('a')) {
+                // console.log(parenele);
+                // console.log(subtract);
+                // console.log(sub);
                 downloadEl.appendChild(downloadLink);
             } 
 
-            checkElementContent(removeFormatContainer);
+            // checkElementContent(removeFormatContainer);
         }
 
-        for(const lisst of checkStatus) {
-            const lii = lisst.querySelector('.download-link a');
-            if(lii) {
-                statusSpinReady.style.display = "none";
-                statusSpinFinish.style.display = "block";
-            }
-            
+        // update file status before and after conversion
+        if(parentFileDiv){
+            const fileStatus = parentFileDiv.querySelector('.status');
+            const readyNotice = fileStatus.querySelector('.spining-ready')
+            const completeNotice = fileStatus.querySelector('.spining-finish')
+            readyNotice.style.display = "none";
+            completeNotice .style.display = "block";
         }
+
+
+
+        
+
+   
+    
 
     } catch (error) {
         // console.log("parentDiv is empty");
     };
 }
+
+
 
 
 // AJAX code sends uploaded file data (formData) to the django backend view function and returns a `response`
@@ -300,16 +318,16 @@ convertButton.addEventListener('click', (event) => {
         const filename = file.name;
         formData.append('files', file, filename);
 
-        // unique uuid
+        // create unique uuid, assign to each file and append the uuid to the formData
         const fileId = `${filename}_` + Math.floor((Math.random() * 1000000) + 1);
-
         const fileDiv = document.getElementById(`file-${filename}`);
+        // const fileIdentifier = document.getElementById(`${filename}-moses`);
         if(fileDiv) {
             fileDiv.dataset.fileId = fileId;
+            // fileIdentifier.dataset.fileId = fileId;
         }
         
         formData.append('uuid', fileId);
-        // console.log(formData);
     }
 
     const files = fileInput.files;
