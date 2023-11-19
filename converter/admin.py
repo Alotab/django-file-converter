@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import uploadConverter
+from .models import UploadConverter, Format
 
 # Register your models here.
 
 
-admin.site.register(uploadConverter)
+admin.site.register(UploadConverter)
+admin.site.register(Format)

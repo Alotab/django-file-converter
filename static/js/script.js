@@ -104,7 +104,7 @@ function handleFilesSelected(){
         } else if(fileIsPresent) {
             fileIcon.style.backgroundImage = 'url("data:image/svg+xml;charset=utf8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%233aa8ff\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M12,19c-3.866,0-7-3.134-7-7s3.134-7,7-7s7,3.134,7,7S15.866,19,12,19z M10,8v8l6-4L10,8z\'/%3E%3C/svg%3E")';
         } else {
-            fileIcon.style.backgroundImage = 'url("data:image/svg+xml;charset=utf8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%234fcb4b\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M5,17.33V6.67L15,4v16L5,17.33z M19,6h-3v12h3V6z M12.852,15.5l-2.08-3.5l2.043-3.5H11.57l-1.244,2.246c-0.047,0.196-0.125,0.382-0.232,0.554c-0.088-0.173-0.158-0.354-0.209-0.539L8.684,8.5H7.338L9.33,12l-2.182,3.5h1.338l1.396-2.416c0.066-0.139,0.117-0.385,0.139-0.385c0.061,0.124,0.104,0.252,0.131,0.385l1.381,2.416H12.852L12.852,15.5z\'/%3E%3C/svg%3E")';
+            fileIcon.style.backgroundImage = 'url("data:image/svg+xml;charset=utf8,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'%23a067e6\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\'%3E%3Cpath d=\'M7,8.5C7,7.119,8.119,6,9.5,6S12,7.119,12,8.5S10.881,11,9.5,11S7,9.881,7,8.5z M14.5,11l-4,6l-2-3L5,19h15L14.5,11z\'/%3E%3C/svg%3E")';
         };
 
 
@@ -123,38 +123,6 @@ function handleFilesSelected(){
        
 
         //========= Popup Format type list when button is clicked  ========//
-        var currentDay = null;
-        // if(buttonClick){
-        //     buttonClick.addEventListener('click', () => {
-        //       activateDrop.classList.add('activate');
-        //     });
-        // };
-       
-
-        // if(buttonClick ){
-        //     buttonClick.addEventListener('click', () => {
-        //         if(currentDay && currentDay !== activateDrop){
-        //             // activateDrop.style.display = "none";
-        //         }
-        //     });
-        // };
-        
-        // if(buttonClick){
-        //     buttonClick.addEventListener('click', function(e){
-        //         e.stopPropagation();
-        //         if(currentDay && currentDay !== activateDrop){
-        //             activateDrop.style.display = "none";
-        //             // console.log('yes');
-        //         }
-        //         if(activateDrop.style.display === "none") {
-        //             activateDrop.style.display = "block";
-        //             currentDay = activateDrop;
-        //         } else {
-        //             activateDrop.style.display = "none";
-        //             currentDay = null;
-        //         }
-        //     });
-        // };
 
         if(buttonClick) {
             buttonClick.addEventListener('click', () => {
@@ -166,21 +134,12 @@ function handleFilesSelected(){
             });
         };
 
-        // Hide the div when the user clicks anywhere on the screen
+        // Hide the format div when the user clicks anywhere on the screen
         window.onclick = function(event) {
             if (event.target != buttonClick) {
                 activateDrop.style.display = "none";
             }
         }
-
-        // click anywhere on the screen to disappear activeDrop
-        // document.addEventListener('click', function(){
-        //     if(currentDay){
-        //         currentDay.style.display = "none";
-        //         currentDay  = null;
-        //     }
-        //     // activateDrop.style.display = "none"; 
-        // })
 
 
        //========= Display type of format user selected ========//
@@ -195,7 +154,6 @@ function handleFilesSelected(){
               activateDrop.style.display = "none";
 
               buttonClick.textContent = format.textContent;
-              
 
               buttonClick.style.setProperty('--display', mydisplay());
             //   selectedFormats.push(format.textContent);

@@ -6,8 +6,8 @@ from django.http import FileResponse
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework import permissions
-from .models import uploadConverter
-from converter.serializers import UploadConverterSerializer, UserSerializer
+# from .models import uploadConverter
+# from converter.serializers import UploadConverterSerializer, UserSerializer
 from converter.permissions import IsOwnerOrReadOnly
 from django.views.decorators.csrf import csrf_exempt
 import csv
@@ -211,36 +211,36 @@ def generate_unique_filename(original_filename, conversion_format):
 
 
 # create a model instance from csv dataset
-def upload_csv(request):
-    """
-        Create a model instance from csv dataset from the user input
-    """
-    if request.method == 'POST':
-        csv_file = request.FILES['csv_file']
-        uploadFiles = []
-        decoded_file = csv_file.read().decode('utf-8').splitlines()
-        reader = csv.reader(decoded_file)
-        next(reader, None)  # skip the header
-        for row in reader:
-            uploadFiles.append({
-                'first_name': row[0],
-                'last_name': row[1],
-                'gender': row[2],
-                'age': row[3],
-                'phone': row[4],
-                'email': row[5],
-                'owner': request.user,
-            })
-        uploadConverter.objects.bulk_create(uploadConverter(**uploadFile) for uploadFile in uploadFiles)
-        return redirect('files')
-    return render(request, 'converter/uploadfile.html')
+# def upload_csv(request):
+#     """
+#         Create a model instance from csv dataset from the user input
+#     """
+#     if request.method == 'POST':
+#         csv_file = request.FILES['csv_file']
+#         uploadFiles = []
+#         decoded_file = csv_file.read().decode('utf-8').splitlines()
+#         reader = csv.reader(decoded_file)
+#         next(reader, None)  # skip the header
+#         for row in reader:
+#             uploadFiles.append({
+#                 'first_name': row[0],
+#                 'last_name': row[1],
+#                 'gender': row[2],
+#                 'age': row[3],
+#                 'phone': row[4],
+#                 'email': row[5],
+#                 'owner': request.user,
+#             })
+#         uploadConverter.objects.bulk_create(uploadConverter(**uploadFile) for uploadFile in uploadFiles)
+#         return redirect('files')
+#     return render(request, 'converter/uploadfile.html')
 
-class CsvFileList(ListView):
-    """
-        List view for populating/Listing all the queryset
-    """
-    model = uploadConverter
-    template_name = 'converter/csvlist.html'
+# class CsvFileList(ListView):
+#     """
+#         List view for populating/Listing all the queryset
+#     """
+#     model = uploadConverter
+#     template_name = 'converter/csvlist.html'
 
 
 
@@ -383,22 +383,22 @@ def xlsx_to_pdf(request):
 
 
 
-class UploadViewSet(viewsets.ModelViewSet):
-    """
-        This viewset automatically provides `list`, `create`, `retrieve, `update` AND `destroy` actions.
-        Additionally we also provide an extra `highlight` action.
-    """
-    queryset = uploadConverter.objects.all()
-    serializer_class = UploadConverterSerializer 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+# class UploadViewSet(viewsets.ModelViewSet):
+#     """
+#         This viewset automatically provides `list`, `create`, `retrieve, `update` AND `destroy` actions.
+#         Additionally we also provide an extra `highlight` action.
+#     """
+#     queryset = uploadConverter.objects.all()
+#     serializer_class = UploadConverterSerializer 
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
    
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-        This viewset automatically provides `LIST` and `RETRIEVE` actions
-    """
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserViewSet(viewsets.ReadOnlyModelViewSet):
+#     """
+#         This viewset automatically provides `LIST` and `RETRIEVE` actions
+#     """
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer

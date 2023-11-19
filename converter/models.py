@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 # model for uploading csv file
-class uploadConverter(models.Model):
+class UploadConverter(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     gender = models.CharField(max_length=100)
@@ -25,4 +25,8 @@ class File(models.Model):
     converted_file_content = models.TextField(blank=True, null=True)
 
 
-# storing files in the datafiles
+class Format(models.Model):
+    type = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return f"{self.type}"
