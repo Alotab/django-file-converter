@@ -350,7 +350,7 @@ input[type="file"] {
     background-size: 24px 24px;
     border-bottom: 1px solid #e7e7e7;
     border-radius: 4px;
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23a067e6' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M7,8.5C7,7.119,8.119,6,9.5,6S12,7.119,12,8.5S10.881,11,9.5,11S7,9.881,7,8.5z M14.5,11l-4,6l-2-3L5,19h15L14.5,11z'/%3E%3C/svg%3E");
+    /* background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23a067e6' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M7,8.5C7,7.119,8.119,6,9.5,6S12,7.119,12,8.5S10.881,11,9.5,11S7,9.881,7,8.5z M14.5,11l-4,6l-2-3L5,19h15L14.5,11z'/%3E%3C/svg%3E"); */
 }
 
 .select-conversion-container{
