@@ -1,19 +1,27 @@
+
+import csv
+import os
+import json
+import uuid
+import tempfile
+import io
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse, JsonResponse
 from django.contrib.auth.models import User
 from django.views.generic import ListView
 from django.http import FileResponse
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
+from django.core.files.temp import NamedTemporaryFile
+from django.conf import settings
 from django.urls import reverse
-from rest_framework import viewsets
-from rest_framework import permissions
+from django import template
+from django.views.decorators.csrf import csrf_exempt
+# from rest_framework import viewsets
+# from rest_framework import permissions
 # from .models import uploadConverter
 # from converter.serializers import UploadConverterSerializer, UserSerializer
 from converter.permissions import IsOwnerOrReadOnly
-from django.views.decorators.csrf import csrf_exempt
-import csv
-import os
-import json
-
 from PyPDF2 import PdfMerger
 from PIL import Image
 import pandas as pd
@@ -22,14 +30,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from .utils import convert_file, upload_jpg
 from .forms import UploadFileForm
 from .models import File
-from django import template
-import uuid
-import tempfile
-from django.core.files.temp import NamedTemporaryFile
-from django.conf import settings
-import io
-from django.http import HttpResponse
-from django.core.files.storage import FileSystemStorage
+
 
 
 
@@ -147,12 +148,96 @@ def upload_filess(request):
     return render(request, 'converter/uploadfile.html', {'converted_File': converted_File})
 
 
-
 def generate_unique_filename(original_filename, conversion_format):
     conversion_format = conversion_format.lower()
     filename_base, filename_ext = os.path.splitext(original_filename)
     unique_filename = f'{filename_base}_{uuid.uuid4()}.{conversion_format}'
     return unique_filename
+
+
+def downloadSS(request, filename):
+    uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+    # Retrieve the converted file from storage
+    fs = FileSystemStorage(location=uploads_dir)
+    converted_file = fs.open(filename)
+
+    # Set the appropriate response content type
+    extension = os.path.splitext(filename)[1]
+    content_type = {
+        '.pdf': 'application/pdf',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.txt': 'text/plain',
+    }.get(extension, 'application/octet-stream')
+    response = HttpResponse(converted_file.read(), content_type=content_type)
+
+    # Set the Content-Disposition header to specify the filename
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    return response
+
+
+def download(request, filename):
+    """
+    This function allows the user to download a converted file.
+    """
+    # Create a new FileResponse object
+    response = FileResponse(open(filename, 'rb'))
+
+    # Set the content type to 'application/pdf'
+    extension = os.path.splitext(filename)[1]
+    content_type = {
+        '.pdf': 'application/pdf',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.txt': 'text/plain',
+    }.get(extension, 'application/octet-stream')
+    # response['Content-Type'] = 'application/pdf'
+    response['Content-Type'] = content_type
+
+    # Set the content disposition to 'attachment' to trigger a download
+    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
+
+    return response
+
+
+## .xlsx to pdf
+def xlsx_to_pdf(request):
+    if request.method == 'POST':
+        xlsxFiles = request.FILES.getlist('file')
+
+        if not xlsxFiles:
+            return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+
+        for xfile in xlsxFiles:
+
+            # Read the data from the Excel file
+            data = pd.read_excel(xfile)
+
+            # Create a PDF document
+            pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
+
+            # Create a table with the data
+            tabel = Table(data.values)
+
+            # Add some style to the table
+            tabel.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+                ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+            ]))
+
+            # Add tabel to the PDF document
+            pdfFile.build([tabel])
+
+    return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
+
+
+
 
 
 
@@ -294,90 +379,90 @@ def generate_unique_filename(original_filename, conversion_format):
 
 #     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
-def downloadSS(request, filename):
-    uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
-    # Retrieve the converted file from storage
-    fs = FileSystemStorage(location=uploads_dir)
-    converted_file = fs.open(filename)
+# def downloadSS(request, filename):
+#     uploads_dir = os.path.join(settings.MEDIA_ROOT, 'uploads')
+#     # Retrieve the converted file from storage
+#     fs = FileSystemStorage(location=uploads_dir)
+#     converted_file = fs.open(filename)
 
-    # Set the appropriate response content type
-    extension = os.path.splitext(filename)[1]
-    content_type = {
-        '.pdf': 'application/pdf',
-        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+#     # Set the appropriate response content type
+#     extension = os.path.splitext(filename)[1]
+#     content_type = {
+#         '.pdf': 'application/pdf',
+#         '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+#         '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 
         
-'.txt': 'text/plain',
-    }.get(extension, 'application/octet-stream')
-    response = HttpResponse(converted_file.read(), content_type=content_type)
+# '.txt': 'text/plain',
+#     }.get(extension, 'application/octet-stream')
+#     response = HttpResponse(converted_file.read(), content_type=content_type)
 
-    # Set the Content-Disposition header to specify the filename
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+#     # Set the Content-Disposition header to specify the filename
+#     response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-    return response
-
-
+#     return response
 
 
-def download(request, filename):
-    """
-    This function allows the user to download a converted file.
-    """
-    # Create a new FileResponse object
-    response = FileResponse(open(filename, 'rb'))
-
-    # Set the content type to 'application/pdf'
-    extension = os.path.splitext(filename)[1]
-    content_type = {
-        '.pdf': 'application/pdf',
-        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        '.txt': 'text/plain',
-    }.get(extension, 'application/octet-stream')
-    # response['Content-Type'] = 'application/pdf'
-    response['Content-Type'] = content_type
-
-    # Set the content disposition to 'attachment' to trigger a download
-    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
-
-    return response
 
 
-## .xlsx to pdf
-def xlsx_to_pdf(request):
-    if request.method == 'POST':
-        xlsxFiles = request.FILES.getlist('file')
+# def download(request, filename):
+#     """
+#     This function allows the user to download a converted file.
+#     """
+#     # Create a new FileResponse object
+#     response = FileResponse(open(filename, 'rb'))
 
-        if not xlsxFiles:
-            return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+#     # Set the content type to 'application/pdf'
+#     extension = os.path.splitext(filename)[1]
+#     content_type = {
+#         '.pdf': 'application/pdf',
+#         '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+#         '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+#         '.txt': 'text/plain',
+#     }.get(extension, 'application/octet-stream')
+#     # response['Content-Type'] = 'application/pdf'
+#     response['Content-Type'] = content_type
 
-        for xfile in xlsxFiles:
+#     # Set the content disposition to 'attachment' to trigger a download
+#     response['Content-Disposition'] = f'attachment; filename="{os.path.basename(filename)}"'
 
-            # Read the data from the Excel file
-            data = pd.read_excel(xfile)
+#     return response
 
-            # Create a PDF document
-            pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
 
-            # Create a table with the data
-            tabel = Table(data.values)
+# ## .xlsx to pdf
+# def xlsx_to_pdf(request):
+#     if request.method == 'POST':
+#         xlsxFiles = request.FILES.getlist('file')
 
-            # Add some style to the table
-            tabel.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
-                ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 14),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
-            ]))
+#         if not xlsxFiles:
+#             return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
 
-            # Add tabel to the PDF document
-            pdfFile.build([tabel])
+#         for xfile in xlsxFiles:
 
-    return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
+#             # Read the data from the Excel file
+#             data = pd.read_excel(xfile)
+
+#             # Create a PDF document
+#             pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
+
+#             # Create a table with the data
+#             tabel = Table(data.values)
+
+#             # Add some style to the table
+#             tabel.setStyle(TableStyle([
+#                 ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+#                 ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+#                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+#                 ('FONTSIZE', (0, 0), (-1, 0), 14),
+#                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#                 ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+#             ]))
+
+#             # Add tabel to the PDF document
+#             pdfFile.build([tabel])
+
+#     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
 
 
