@@ -1,10 +1,15 @@
 
-
-
 //======================PROCESS FILES ============================//
 // `handleFilesSelected` function displays all the files uploaded by the user to the screen
 
+// const fileInput = document.querySelector('#file-input');
+const fileInput = document.getElementById('file-input');
+const formatSelects = document.querySelectorAll('.btn-button');
+const formatSele = document.querySelector('.btn-button');
+const convertButton = document.querySelector('.convert');
+const selectForma = document.getElementById('formatSelect');
 
+// const removeFormatSelector = document.querySelector('.btn');
 const fileIn = document.getElementById('file-input');
 const selectedFiles = document.getElementById('files-list');
 
@@ -168,25 +173,7 @@ document.getElementById('file-input').addEventListener('change', handleFilesSele
 
 
 
-// const fileInput = document.querySelector('#file-input');
-const fileInput = document.getElementById('file-input');
-const formatSelects = document.querySelectorAll('.btn-button');
-const formatSele = document.querySelector('.btn-button');
-const convertButton = document.querySelector('.convert');
-
-const selectForma = document.getElementById('formatSelect');
-
-// const removeFormatSelector = document.querySelector('.btn');
-
-
-
-
-
-
-
 convertButton.addEventListener('click', ()=> {
-
-
     // observer.takeRecords();
 
     // removeFormatSelector.style.display = 'none';
@@ -221,18 +208,6 @@ const lisltlist = [];
 function filefileHandle() {
     const fileLists = this.files;
 }
-
-
-
-// convertButton.addEventListener('click', () => {
-//     // var formats = Array.from(buttonClick).map(select => select);
-//     var tryy = selectForma.forEach(forma => {
-//         forma.textContent;
-//     }) 
-//     // var takeout = selectForma.textContent;
-
-// });
-
 
 
 // This function loops through all the format buttons
@@ -283,8 +258,6 @@ function appendDownloadLink(fileId, downloadUrl) {
         // console.log("parentDiv is empty");
     };
 }
-
-
 
 
 // AJAX code sends uploaded file data (formData) to the django backend view function and returns a `response`
@@ -359,7 +332,6 @@ convertButton.addEventListener('click', (event) => {
 
 
 
-
 // converts file sizes from bytes to megabytes, kilibytes and gigabytes
 function formatSizeUnits(bytes) {
     if (bytes >= 1073741824) {
@@ -388,7 +360,7 @@ function checkFileSize(f){
     const fileSizeInKBOrMB = fileSizeInBytes < 1024 ? fileSizeInBytes / 1024 : fileSizeInBytes / (1024 * 1024);
   
     const roundedFileSizeInKBOrMB = Math.ceil(fileSizeInKBOrMB);
-    console.log("rounded ", roundedFileSizeInKBOrMB);
+    // console.log("rounded ", roundedFileSizeInKBOrMB);
   
     const fileSizeElement = document.querySelector('.file-size');
     const insertAllo = `${roundedFileSizeInKBOrMB} ${fileSizeInBytes < 1024 ? 'KB' : 'MB'}`
@@ -404,7 +376,14 @@ function checkFileSize(f){
 
 
 
+// convertButton.addEventListener('click', () => {
+//     // var formats = Array.from(buttonClick).map(select => select);
+//     var tryy = selectForma.forEach(forma => {
+//         forma.textContent;
+//     }) 
+//     // var takeout = selectForma.textContent;
 
+// });
 
 
 
