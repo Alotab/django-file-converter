@@ -34,30 +34,6 @@ def convert_file(file_object, conversion_format):
 
     return converted_file
 
-# def convert_file(files, formats):
-#     newFile = None
-#     for file in files:
-#         for format in formats:
-#             filename = file.name
-            
-#             # filename = filename.decode("utf-8")
-#             _, file_extension = os.path.splitext(filename)
-#             print(file_extension)
-            
-#             if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
-#                 print('should be workinh')
-#                 newFile = upload_jpg(file, format)
-#             elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
-#                 print('DONT WORK COS IF XLSX')
-#                 newFile = xlsx_to_pdf(file)
-#             elif file_extension in ('.pdf') and format == 'CSV':
-#                 newFile = pdf_to_csv(file)
-#             else:
-#                 print(f'File extension {file_extension} is not supported for format {format}')
-#                 print('DONT WORK COS YOU HAVE NO FORMAT')
-
-#     return newFile
-
 
 def upload_jpg(file, format):
     """
@@ -95,8 +71,8 @@ def upload_jpg(file, format):
     # pdfFile = 'output.pdf'
     merger.write(pdfFile)
     merger.close()
-    return pdfFile
-    # return File(open(pdfFile, 'rb'), name=pdfFile)
+    return pdfFile       #File(open(pdfFile, 'rb'), name=pdfFile)
+    
     
 
 def xlsx_to0000_pdf(file):
@@ -203,9 +179,29 @@ def xlsx_tooooo_pdf(file):
 
 
 
+# def convert_file(files, formats):
+#     newFile = None
+#     for file in files:
+#         for format in formats:
+#             filename = file.name
+            
+#             # filename = filename.decode("utf-8")
+#             _, file_extension = os.path.splitext(filename)
+#             print(file_extension)
+            
+#             if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
+#                 print('should be workinh')
+#                 newFile = upload_jpg(file, format)
+#             elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
+#                 print('DONT WORK COS IF XLSX')
+#                 newFile = xlsx_to_pdf(file)
+#             elif file_extension in ('.pdf') and format == 'CSV':
+#                 newFile = pdf_to_csv(file)
+#             else:
+#                 print(f'File extension {file_extension} is not supported for format {format}')
+#                 print('DONT WORK COS YOU HAVE NO FORMAT')
 
-
-
+#     return newFile
 
 
 
