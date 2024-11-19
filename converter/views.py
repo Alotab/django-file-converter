@@ -27,7 +27,7 @@ from PIL import Image
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-from .utils import convert_file, upload_jpg
+from .utils import convert_file
 from .forms import UploadFileForm
 from .models import File
 
@@ -202,39 +202,39 @@ def download(request, filename):
 
 
 ## .xlsx to pdf
-def xlsx_to_pdf(request):
-    if request.method == 'POST':
-        xlsxFiles = request.FILES.getlist('file')
+# def xlsx_to_pdf(request):
+#     if request.method == 'POST':
+#         xlsxFiles = request.FILES.getlist('file')
 
-        if not xlsxFiles:
-            return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
+#         if not xlsxFiles:
+#             return render(request, 'converter/uploadfile.html', {'error': 'Please select a file to upload'})
 
-        for xfile in xlsxFiles:
+#         for xfile in xlsxFiles:
 
-            # Read the data from the Excel file
-            data = pd.read_excel(xfile)
+#             # Read the data from the Excel file
+#             data = pd.read_excel(xfile)
 
-            # Create a PDF document
-            pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
+#             # Create a PDF document
+#             pdfFile = SimpleDocTemplate('excelfile.pdf', pagesize=letter)
 
-            # Create a table with the data
-            tabel = Table(data.values)
+#             # Create a table with the data
+#             tabel = Table(data.values)
 
-            # Add some style to the table
-            tabel.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
-                ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 14),
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
-            ]))
+#             # Add some style to the table
+#             tabel.setStyle(TableStyle([
+#                 ('BACKGROUND', (0, 0), (-1, 0), '#d0d0d0'),
+#                 ('TEXTCOLOR', (0, 0), (-1, 0), '#000000'),
+#                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+#                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+#                 ('FONTSIZE', (0, 0), (-1, 0), 14),
+#                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+#                 ('BACKGROUND', (0, 1), (-1, -1), '#f5f5f5'),
+#             ]))
 
-            # Add tabel to the PDF document
-            pdfFile.build([tabel])
+#             # Add tabel to the PDF document
+#             pdfFile.build([tabel])
 
-    return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
+#     return render(request, 'converter/uploadfile.html', {'pdfFile': pdfFile})
 
 
 

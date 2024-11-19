@@ -6,8 +6,8 @@ from . import views
 
 filename_pattern = '[^/]+'
 urlpatterns = [
-    path('upload/', views.upload_file, name='upload_file'),
-    path('download/<str:filename>/', views.download, name='download'),
+  path('upload/', views.upload_file, name='upload_file'),
+  path('download/<str:filename>/', views.download, name='download'),
 ]
 
 

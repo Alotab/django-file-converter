@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import FileResponse
 from PyPDF2 import PdfMerger
 from PIL import Image
+from io import BytesIO
 import os
 import pandas as pd
 from openpyxl import load_workbook
@@ -14,6 +15,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import pandas
 import pdfkit
 import tabula
+import io
 
 
 def convert_file(file_object, conversion_format):
@@ -23,7 +25,7 @@ def convert_file(file_object, conversion_format):
 
     converted_file = None
 
-    if file_extension in ('.jpg', '.jpeg') and conversion_format == 'PDF':
+    if file_extension in ('.jpg', '.jpeg', '.jfi') and conversion_format == 'PDF':
         converted_file = upload_jpg(file_object, conversion_format)
     elif file_extension in ('.xlsx', '.xls') and conversion_format == 'PDF':
         converted_file = xlsx_to_pdf(file_object)
@@ -34,6 +36,11 @@ def convert_file(file_object, conversion_format):
 
     return converted_file
 
+# from PIL import Image
+# from PyPDF2 import PdfMerger
+# import tempfile
+# import os
+
 
 def upload_jpg(file, format):
     """
@@ -42,36 +49,92 @@ def upload_jpg(file, format):
     pdfFile = None
     merger = PdfMerger()
 
-    # print(f"Number of files: {len(files)}")
-    # for file in files:
-        # print(file)
-    # print(f"Number of formats: {len(formats)}")
-
-    # for file, format in zip(files, formats):
-
     filename = file.name
     name, _ = os.path.splitext(filename)
 
-    im = Image.open(file)
-        
-    if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
-        im.load()
-        background = Image.new("RGB", im.size, (255, 255, 255))
-        background.paste(im, mask=im.split()[3])
-        im = background
+    try:
+        # Open the image and verify it
+        image = Image.open(file)
+        image.verify()  # Verify that the image is valid
+        print(f"Valid image format: {image.format}")
 
-    # Create a temporary file with a unique name and Save the image as a temporary PDF file.  Add the temporary PDF file to the merger
-    with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
-        im.save(temp.name, 'PDF', encoding='latin-1')
-        merger.append(temp.name)
+        # Handle transparency (RGBA, LA, etc.)
+        if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
+            image.load()
+            background = Image.new("RGB", image.size, (255, 255, 255))  # White background
+            background.paste(image, mask=image.split()[3])  # Paste with transparency mask
+            image = background
+
+        # Save the image as a PDF in memory using BytesIO (in-memory file-like object)
+        pdf_bytes_io = io.BytesIO()  # Create an in-memory byte stream
+
+        # Save image as PDF into the byte stream
+        image.save(pdf_bytes_io, 'PDF', encoding='latin-1')
+        pdf_bytes_io.seek(0)  # Rewind the in-memory byte stream to the beginning
+
+        # Append the in-memory PDF file to the merger
+        merger.append(pdf_bytes_io)
+
+    except Exception as e:
+        print(f"Error: {e}")
 
     # Save the merged PDF file
     format = format.lower()
     pdfFile = f"{name}.{format}"
-    # pdfFile = 'output.pdf'
+
+    # Write the final merged PDF to a file
     merger.write(pdfFile)
     merger.close()
-    return pdfFile       #File(open(pdfFile, 'rb'), name=pdfFile)
+    print(f"PDF saved as {pdfFile}")
+
+    return pdfFile  # Return the path to the final merged PDF
+
+
+
+# def upload_jpg(file, format):
+#     """
+#     This function converts the `.jpg` and `.jpeg` files into one `.pdf` file.
+#     """
+#     pdfFile = None
+#     merger = PdfMerger()
+
+#     # print(f"Number of files: {len(files)}")
+#     # for file in files:
+#         # print(file)
+#     # print(f"Number of formats: {len(formats)}")
+
+#     # for file, format in zip(files, formats):
+
+#     filename = file.name
+#     name, _ = os.path.splitext(filename)
+
+#     try:
+#         image = Image.open(file)
+#         image.verify() # verify that the image is valid
+#         print(f"Valid image formart: {image.format}")
+        
+#         if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
+#             image.load()
+#             background = Image.new("RGB", image.size, (255, 255, 255))
+#             background.paste(image, mask=image.split()[3])
+#             image = background
+        
+#          # Create a temporary file with a unique name and Save the image as a temporary PDF file.  Add the temporary PDF file to the merger
+#         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
+#             image.save(temp.name, 'PDF', encoding='latin-1')
+#             merger.append(temp.name)
+#     except Exception as e:
+#         print(f"Error: {e}")
+
+
+#     # Save the merged PDF file
+#     format = format.lower()
+#     pdfFile = f"{name}.{format}"
+#     # pdfFile = 'output.pdf'
+#     merger.write(pdfFile)
+#     merger.close()
+#     return pdfFile      
+#File(open(pdfFile, 'rb'), name=pdfFile)
     
     
 
