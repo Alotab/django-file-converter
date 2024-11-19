@@ -55,7 +55,7 @@ def upload_jpg(file, format):
     try:
         # Open the image and verify it
         image = Image.open(file)
-        image.verify()  # Verify that the image is valid
+        # image.verify()  # Verify that the image is valid
         print(f"Valid image format: {image.format}")
 
         # Handle transparency (RGBA, LA, etc.)
