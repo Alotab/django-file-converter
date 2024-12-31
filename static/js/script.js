@@ -24,7 +24,7 @@ function handleFilesSelected(){
         li.classList.add('file-list');
         // li.id = `${f.name}-moses`;
 
-        const insert = formatSizeUnits(f.size);
+        const fileSize = formatSizeUnits(f.size);
         li.innerHTML = `
                           <div class="file-name-wrapper" id=file-${f.name}>
                               <span class="file-name-icon"></span>
@@ -82,7 +82,7 @@ function handleFilesSelected(){
                               <i class="ri-refresh-line"></i>
                           </div>
 
-                          <div class="file-size">${insert}</div>
+                          <div class="file-size">${fileSize}</div>
                           <div class="download-link">
                           </div>
                           

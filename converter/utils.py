@@ -12,35 +12,55 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 # from django.core.files import File
+import pdfplumber
 import pandas
 import pdfkit
 import tabula
 import io
 
 
+
 def convert_file(file_object, conversion_format):
     filename = file_object.name
     # filename = 'another.jpg'
-    _, file_extension = os.path.splitext(filename)
+    name, file_extension = os.path.splitext(filename)
+    print(name)
 
     converted_file = None
 
     if file_extension in ('.jpg', '.jpeg', '.jfi') and conversion_format == 'PDF':
         converted_file = upload_jpg(file_object, conversion_format)
     elif file_extension in ('.xlsx', '.xls') and conversion_format == 'PDF':
-        converted_file = xlsx_to_pdf(file_object)
+        converted_file = xlsx_pdf(file_object)
     elif file_extension in ('.pdf') and conversion_format == 'CSV':
-        converted_file = pdf_to_csv(file_object)
+        pass
+        # converted_file = pdf_to_csv(file_object)
+    elif file_extension in ('.pdf') and conversion_format == 'XLS':
+        converted_file = pdf_excel(file_object, name)
     else:
         print(f'File extension {file_extension} is not supported for format {conversion_format}')
 
     return converted_file
 
-# from PIL import Image
-# from PyPDF2 import PdfMerger
-# import tempfile
-# import os
+def pdf_excel(file, name):
+    excel_file = f'{name}.xls'
+    with pdfplumber.open(file) as pdf:
+        all_tables = []
+        for page in pdf.pages:
+            tables = page.extract_tables()
+            for table in tables:
+                if table:
+                    df = pd.DataFrame(table)
+                    all_tables.append(df)
 
+        if not tables:
+            all_tables.append(pd.DataFrame([["No tables found"]]))
+        
+        with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+            for idx, df in enumerate(all_tables):
+                df.to_excel(writer, sheet_name=f'Sheet{idx+1}', index=False)
+
+    return excel_file
 
 def upload_jpg(file, format):
     """
@@ -55,7 +75,6 @@ def upload_jpg(file, format):
     try:
         # Open the image and verify it
         image = Image.open(file)
-        # image.verify()  # Verify that the image is valid
         print(f"Valid image format: {image.format}")
 
         # Handle transparency (RGBA, LA, etc.)
@@ -89,67 +108,6 @@ def upload_jpg(file, format):
 
     return pdfFile  # Return the path to the final merged PDF
 
-
-
-# def upload_jpg(file, format):
-#     """
-#     This function converts the `.jpg` and `.jpeg` files into one `.pdf` file.
-#     """
-#     pdfFile = None
-#     merger = PdfMerger()
-
-#     # print(f"Number of files: {len(files)}")
-#     # for file in files:
-#         # print(file)
-#     # print(f"Number of formats: {len(formats)}")
-
-#     # for file, format in zip(files, formats):
-
-#     filename = file.name
-#     name, _ = os.path.splitext(filename)
-
-#     try:
-#         image = Image.open(file)
-#         image.verify() # verify that the image is valid
-#         print(f"Valid image formart: {image.format}")
-        
-#         if image.mode in ("RGBA", "LA") or (image.mode == "P" and "transparency" in image.info):
-#             image.load()
-#             background = Image.new("RGB", image.size, (255, 255, 255))
-#             background.paste(image, mask=image.split()[3])
-#             image = background
-        
-#          # Create a temporary file with a unique name and Save the image as a temporary PDF file.  Add the temporary PDF file to the merger
-#         with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as temp:
-#             image.save(temp.name, 'PDF', encoding='latin-1')
-#             merger.append(temp.name)
-#     except Exception as e:
-#         print(f"Error: {e}")
-
-
-#     # Save the merged PDF file
-#     format = format.lower()
-#     pdfFile = f"{name}.{format}"
-#     # pdfFile = 'output.pdf'
-#     merger.write(pdfFile)
-#     merger.close()
-#     return pdfFile      
-#File(open(pdfFile, 'rb'), name=pdfFile)
-    
-    
-
-def xlsx_to0000_pdf(file):
-    filename = file.name
-    name,_ = os.path.splitext(filename)
-    output = f'{name}.pdf'
-    
-    df = pd.read_excel(file)
-    df.to_html('file.html')
-    pdFile = pdfkit.from_file('file.html', output)
-    print(type(pdFile))
-    return pdFile
-
-
 def xlsx_to_pdf(file):
     filename = file.name
     name,_ = os.path.splitext(filename)
@@ -173,11 +131,7 @@ def pdf_to_csv(file):
     csvFile = tabula.convert_into(file, output)
     return csvFile
 
-
-
-
-
-def xlsx_tooooo_pdf(file):
+def xlsx_pdf(file):
     """
         This function converts all excel files `.xlsx`, `.xlx` into `pdf`
     """
@@ -227,64 +181,16 @@ def xlsx_tooooo_pdf(file):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def convert_file(files, formats):
-#     newFile = None
-#     for file in files:
-#         for format in formats:
-#             filename = file.name
-            
-#             # filename = filename.decode("utf-8")
-#             _, file_extension = os.path.splitext(filename)
-#             print(file_extension)
-            
-#             if file_extension in ('.jpg', '.jpeg') and format == 'PDF':
-#                 print('should be workinh')
-#                 newFile = upload_jpg(file, format)
-#             elif file_extension in ('.xlsx', '.xls') and format == 'PDF':
-#                 print('DONT WORK COS IF XLSX')
-#                 newFile = xlsx_to_pdf(file)
-#             elif file_extension in ('.pdf') and format == 'CSV':
-#                 newFile = pdf_to_csv(file)
-#             else:
-#                 print(f'File extension {file_extension} is not supported for format {format}')
-#                 print('DONT WORK COS YOU HAVE NO FORMAT')
-
-#     return newFile
-
-
-
-# def convert_file(files, formats):
-#     newFile = None
+def xlsx_to0000_pdf(file):
+    filename = file.name
+    name,_ = os.path.splitext(filename)
+    output = f'{name}.pdf'
     
-#     for file in files:
-#         filename = file.name
-#         # file = file.name.replace('\x00', '')
-#         # print(file)
-#         hii, file_extension = os.path.splitext(filename)
-#         # print(hii)
-#         # print(conversion)
-#         if file_extension in ('.jpg', '.jpeg') and 'pdf' in format:
-#             newFile = upload_jpg(files, formats)
-#         elif file_extension in ('.xlsx') and 'pdf' in format:
-#             newFile = xlsx_to_pdf(files)
-#         else:
-#             print(f'File extension {file_extension} is not')
-#     return newFile
+    df = pd.read_excel(file)
+    df.to_html('file.html')
+    pdFile = pdfkit.from_file('file.html', output)
+    print(type(pdFile))
+    return pdFile
 
 
 
@@ -323,9 +229,3 @@ def xlsx_tooooo_pdf(file):
 #     pdfFile.build([tabel])
 
 #     return pdfFile
-
-
-
-
-
-

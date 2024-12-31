@@ -97,7 +97,7 @@ def upload_file(request):
 
 
 @csrf_exempt
-def upload_filess(request):
+def upload_files(request):
     converted_File = None
     converted_files = []
     temp_dir = tempfile.TemporaryDirectory()
