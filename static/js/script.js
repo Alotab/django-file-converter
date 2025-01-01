@@ -66,6 +66,7 @@ function handleFilesSelected(){
                                                       <li class="current format-btns btn-secondarys"><span>XLSX</span></li>
                                                       <li class="current format-btns btn-secondarys"><span>XLS</span></li>
                                                       <li class="current format-btns btn-secondarys"><span>CSV</span></li>
+                                                      <li class="current format-btns btn-secondarys"><span>DOCX</span></li>
                                                   </ul>
                                               </div>
                                           </div>

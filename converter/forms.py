@@ -1,5 +1,6 @@
 from django import forms 
 from django.forms import ModelForm, ChoiceField
+from .models import UploadedFile
 
 select = ''
 pdf = 'pdf'
@@ -16,6 +17,10 @@ CONVERSION_CHOICES = [
 ]
 
 
+class FileUploadForm(forms.ModelForm):
+    class Meta:
+        model = UploadedFile
+        fields = ['file']
 
 
 class UploadFileForm(forms.Form):

@@ -1,6 +1,13 @@
 from django.db import models
 from django.conf import settings
 
+class UploadedFile(models.Model):
+    file = models.FileField(upload_to='uploads/')  # This will store files in the 'media/uploads/' folder
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.file.name
+
 
 # model for uploading csv file
 class UploadConverter(models.Model):
@@ -14,7 +21,6 @@ class UploadConverter(models.Model):
 
     def __str__(self):
         return f"{self.first_name}{self.last_name}"
-
 
 
 class File(models.Model):

@@ -11,6 +11,8 @@
                         {% csrf_token %}
                         <i class="ri-file-add-fill"></i>
                         <p>Select File</p>
+                        <!-- {{ form.as_p }} -->
+                        <!-- <button type="submit">Upload</button> -->
                         <input type="file" id="file-input" name="files[]" multiple> 
                     </form>   
                 </div>
@@ -32,8 +34,8 @@
         <div class="addfiles-Todo">
             <ul class="file-list" id="files-list">
                 <!-- add uploaded files here  (Javascript) -->
-                <li class="file-list">
 
+                <!-- <li class="file-list">
                     <div class="file-name-wrapper" id='file-${f.name}'>
                         <span class="file-name-icon"></span>
                         <div class="file-name-p">
@@ -42,14 +44,10 @@
                     </div>
               
                     <div class="select-conversion-container">
-                    <!--    <span>to</span> -->
                         <div class="conversion">
                             <button class="btn-button btn-caret btn btn-sm btn-outline-dark" id="formatSelect"></button>
-                            <!-- <div class="select-convertor"> -->
                                 
-                                <!-- <div class="enclose"> -->
                             <div class="dropdown-menu select-choice-container select-format" style="display: none;">
-                            <!-- <div class="dropdown-menu"> -->
                                 <div class="format-search">
                                     <input class="form-search" type="text" placeholder="Search">
                                     <i class="ri-search-line search-icon"></i>
@@ -80,9 +78,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                                <!-- </div> -->
-                            <!-- </div> -->
+                            </div>                        
                         </div>
                     </div>
 
@@ -95,18 +91,17 @@
                     <div class="file-size">120KB</div>
 
                     <div class="download-link"></div>
-                    
+
                     <div class="close-button">
                         <i class="ri-close-line"></i>
                     </div>
-
-                </li>
+                </li> -->
 
                 
             </ul>
      
             <div class="convert-button convert">
-                <i class="ri-refresh-line"></i>
+                <!-- <i class="ri-refresh-line"></i> -->
                 <button class="converts"><p>Convert</p></button>
             </div>
         </div>
